@@ -17,7 +17,7 @@ export default function LogoSection({ isIcon, sx, to }) {
 
   return (
     <ButtonBase disableRipple {...(isLoggedIn && { component: Link, to: !to ? APP_DEFAULT_PATH : to, sx })}>
-      {isIcon ? <LogoIcon /> : <Logo />}
+      {isIcon ? <img width="60px" src='/img/slg.png' /> : <img width="100px" src='/img/slg.png' />}
     </ButtonBase>
   );
 }

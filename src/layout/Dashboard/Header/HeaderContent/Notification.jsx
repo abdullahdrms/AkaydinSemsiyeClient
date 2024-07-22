@@ -100,7 +100,7 @@ export default function NotificationPage() {
               <ClickAwayListener onClickAway={handleClose}>
                 <MainCard elevation={0} border={false}>
                   <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h5">Notifications</Typography>
+                    <Typography variant="h5">Bildirimler</Typography>
                     <Link href="#" variant="h6" color="primary">
                       Mark all read
                     </Link>
@@ -126,11 +126,7 @@ export default function NotificationPage() {
                       <ListItemText
                         primary={
                           <Typography variant="h6">
-                            It&apos;s{' '}
-                            <Typography component="span" variant="subtitle1">
-                              Cristina danny&apos;s
-                            </Typography>{' '}
-                            birthday today.
+                            Bildirimler Yakında !
                           </Typography>
                         }
                         secondary="2 min ago"
@@ -142,7 +138,7 @@ export default function NotificationPage() {
                       </ListItemSecondaryAction>
                     </ListItemButton>
 
-                    <ListItemButton>
+                    {/* <ListItemButton>
                       <ListItemAvatar>
                         <Avatar type="outlined">
                           <MessageText1 size={20} variant="Bold" />
@@ -213,7 +209,7 @@ export default function NotificationPage() {
                           9:10 PM
                         </Typography>
                       </ListItemSecondaryAction>
-                    </ListItemButton>
+                    </ListItemButton> */}
                   </List>
                   <Stack direction="row" justifyContent="center">
                     <Link href="#" variant="h6" color="primary">

@@ -10,10 +10,6 @@ const GetPayment = (id) => {
     return get(`/api/payments/${id}?populate=payment_type`);
 }
 
-const UpdatePayment = ({ id, data }) => {
-    return put(`/api/payments/${id}`, data, true)
-}
-
 
 const AddPayment = (payload) =>
     post(
@@ -23,4 +19,21 @@ const AddPayment = (payload) =>
 const PaymentRemove = (id) => remove('/api/payments/' + id)
 
 
-export { GetAllPaymentsByReservation, AddPayment, PaymentRemove, GetPayment, UpdatePayment }
+const GetPayments = (id) => {
+    return get(`/Payments/GetList?orderId=${id}`, true);
+}
+
+const GetPaymentTypes = () => {
+    return get(`/Payments/GetPaymentTypeList`, true);
+}
+
+const CreatePayment = (fd) => {
+    return post(`/Payments/Create`, fd, true, true);
+}
+
+const UpdatePayment = (fd) => {
+    return post(`/Payments/Update`, fd, true, true);
+}
+
+
+export { GetAllPaymentsByReservation, AddPayment, PaymentRemove, GetPayment, UpdatePayment, GetPayments, GetPaymentTypes, CreatePayment }

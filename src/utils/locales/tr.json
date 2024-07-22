@@ -22,11 +22,17 @@
   "settings-menu-user-list": "Kullanıcılar",
   "settings-menu-role-list": "Roller",
 
-  "facilities-group-title":"Tesis Yönetimi",
-  "facilities-villas-list-title":"Villa Yönetimi",
-  "facilities-aparts-list-title":"Apart Yönetimi",
+  "orders-group-title":"Sipariş Yönetimi",
+  "orders-list-title":"Sipariş Listesi",
 
-  "reservations-group-title":"Rezervasyon Yönetimi",
-  "reservations-list-title":"Rezervasyon Listesi",
-  "reservations-add-title":"Rezervasyon Ekle"
+  "products-group-title": "Ürün Yönetimi",
+  "products-list-title": "Ürün Listesi",
+  
+  "customers-group-title": "Müşteri Yönetimi",
+  "customers-list-title": "Müşteriler",
+  "customers-business-list-title": "Bayiler",
+
+  "employees-group-title":"Personel Yönetimi",
+  "employees-departments-list-title": "Departmanlar",
+  "employees-list-title": "Personeller"
 }

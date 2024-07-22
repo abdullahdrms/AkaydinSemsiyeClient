@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 export default function Footer() {
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: '24px 16px 0px', mt: 'auto' }}>
-      <Typography variant="caption">&copy; Labirent Fethiye ♥ crafted by Grande Digital</Typography>
+      <Typography variant="caption">&copy; Akaydin Şemsiye crafted by Grande Digital</Typography>
       {/* <Stack spacing={1.5} direction="row" justifyContent="space-between" alignItems="center">
         <Link component={RouterLink} to="http://grandedigital.com" target="_blank" variant="caption" color="text.primary">
           Home

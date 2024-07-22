@@ -1,6 +1,3 @@
-const user = JSON.parse(localStorage.getItem("user"));
-const serviceToken = localStorage.getItem("serviceToken");
-
 function objectToFormData(data) {
   let form_data = new FormData();
 
@@ -19,6 +16,9 @@ function request(
   formData = false
 ) {
   return new Promise(async (resolve, reject) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const serviceToken = localStorage.getItem("serviceToken");
+
     let response, result;
     let options = {};
 
@@ -53,11 +53,11 @@ function request(
       options.body = formData ? data : JSON.stringify(data);
     }
     else if (data && method === "POST") {
-      options.body = formData ? objectToFormData(data) : JSON.stringify(data);
+      options.body = formData ? data : JSON.stringify(data);
     }
 
     if (data && method === "PUT") {
-      options.body = formData ? objectToFormData(data) : JSON.stringify(data);
+      options.body = formData ? data : JSON.stringify(data);
     }
 
     if (data && !formData && method === "POST") {
@@ -69,7 +69,7 @@ function request(
     }
 
     try {
-      response = await fetch('http://185.59.31.233:2030' + url, options);
+      response = await fetch('http://v2.akaydinsemsiye.com/api' + url, options);
       //console.log(response.body);
       result = await response.json();
     } catch (error) {

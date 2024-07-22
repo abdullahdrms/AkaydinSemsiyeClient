@@ -22,12 +22,17 @@
   "under-construction": "Under Construction",
 
   
-  "facilities-group-title":"Facility Management",
-  "facilities-villas-list-title":"Villa Management",
-  "facilities-aparts-list-title":"Apart Management",
-  "reservations-group-title":"Reservations Management",
-  "reservations-list-title":"Reservations List",
-  "reservations-add-title":"Reservations Add",
+  "orders-group-title":"Sipariş Yönetimi",
+  "orders-list-title":"Sipariş Listesi",
 
-  "baris":"barış"
+  "products-group-title": "Ürün Yönetimi",
+  "products-list-title": "Ürün Listesi",
+
+  "customers-group-title": "Müşteri Yönetimi",
+  "customers-list-title": "Müşteriler",
+  "customers-business-list-title": "Bayiler",
+
+  "employees-group-title":"Personel Yönetimi",
+  "employees-departments-list-title": "Departmanlar",
+  "employees-list-title": "Personeller"
 }

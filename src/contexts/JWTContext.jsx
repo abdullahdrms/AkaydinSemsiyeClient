@@ -96,15 +96,12 @@ export const JWTProvider = ({ children }) => {
     // });
 
     var fd = new FormData();
-    fd.append("identifier", email);
-    fd.append("password", password);
+    fd.append("Email", email);
+    fd.append("Password", password);
 
-    const response = await axios.post('/auth/local', fd);
-
-    console.log(response.data);
-
+    const response = await axios.post('/Auth/Login', fd);
     const user = response.data.user;
-    setSession(response.data.jwt);
+    setSession(response?.data?.data?.token);
     dispatch({
       type: LOGIN,
       payload: {
