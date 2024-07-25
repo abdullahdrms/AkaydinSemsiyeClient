@@ -1,1 +1,1 @@
-# labirent-fethiye-panel
+# akaydin-semsiye-panel
