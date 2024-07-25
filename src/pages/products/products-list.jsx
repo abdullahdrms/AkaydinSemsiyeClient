@@ -202,10 +202,6 @@ export default function ProductsList() {
     const columns = useMemo(
         () => [
             {
-                header: 'Ürün Id',
-                cell: ({ row }) => { return row?.original?.id }
-            },
-            {
                 header: 'Ürün Adı',
                 accessorKey: 'name',
                 cell: ({ row, getValue }) => (

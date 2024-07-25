@@ -281,7 +281,7 @@ export default function OrderList() {
             },
             {
                 header: 'Termin Tarihi',
-                cell: ({ row }) => { return row?.original?.deadline }
+                cell: ({ row }) => { return formatDate(stringToDate(row?.original?.deadline)) }
             },
             {
                 header: 'İşlemler',
