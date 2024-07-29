@@ -15,15 +15,22 @@ import { Edit, Eye } from 'iconsax-react';
 import { formatDate, stringToDate } from 'utils/custom/dateHelpers';
 import PaymentUpdateModal from './PaymentUpdateModal';
 
-export default function PaymentTable({ id, isEdit, setIsEdit }) {
+export default function PaymentTable({ id, isEdit, setIsEdit, data }) {
     const [rows, setRows] = useState([])
     const [loading, setLoading] = useState(true)
     const [selectedPayment, setSelectedPayment] = useState([])
     const [paymentUpdateModal, setPaymentUpdateModal] = useState(false)
 
+    let totalPrice = 0
+    let totalTaxPrice = 0
+
     useEffect(() => {
         if (id || isEdit) {
             setRows([])
+            data?.map((item, i) => {
+                totalPrice = totalPrice + (item?.price * item?.qty)
+                totalTaxPrice = totalTaxPrice + (((item?.price * item?.qty) * item?.tax) / 100)
+            })
             GetPayments(id).then((res) => {
                 let totalPayment = 0
                 res?.data?.map((item, i) => {
@@ -50,7 +57,7 @@ export default function PaymentTable({ id, isEdit, setIsEdit }) {
                             till: "",
                             paymentDesc: "",
                             amount: "Kalan Ödeme",
-                            text: `${totalPayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL`,
+                            text: `${((totalPrice + totalTaxPrice) - totalPayment).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL`,
                         }
                         setRows((prevValues) => [...prevValues, data2])
                     }
@@ -89,7 +96,7 @@ export default function PaymentTable({ id, isEdit, setIsEdit }) {
                                             {
                                                 row?.text ? row?.text :
                                                     <Stack style={{ justifyContent: 'end' }} direction="row" spacing={0}>
-                                                        
+
                                                         <Tooltip title="Edit">
                                                             <IconButton
                                                                 color="primary"

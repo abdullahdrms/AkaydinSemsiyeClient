@@ -89,7 +89,10 @@ const DeleteUmrella = (fd) => {
     return post(`/OrderDetails/Delete`, fd, true, true);
 }
 
+const GetOrderDeliveryList = (fd) => {
+    return post(`/Orders/GetOrderDeliveryList`, fd, true, true);
+}
 
 
 
-export { GetOrders, CreateOrder, GetDetail, UpdateOrder, CreateCamellia, CreateLuxuryUmbrella, CreateEcoUmbrella, CreateSidePoloUmbrella, CreateClassicUmbrella, CreateSparePartsService, CreateWoodenUmbrella, CreateBeachUmbrella, GetOrderDetail, DeleteUmrella, UpdateCamellia, UpdateLuxuryUmbrella, UpdateEcoUmbrella, UpdateSidePoloUmbrella, UpdateClassicUmbrella, UpdateSparePartsService, UpdateWoodenUmbrella, UpdateBeachUmbrella }
+export { GetOrders, CreateOrder, GetDetail, UpdateOrder, CreateCamellia, CreateLuxuryUmbrella, CreateEcoUmbrella, CreateSidePoloUmbrella, CreateClassicUmbrella, CreateSparePartsService, CreateWoodenUmbrella, CreateBeachUmbrella, GetOrderDetail, DeleteUmrella, UpdateCamellia, UpdateLuxuryUmbrella, UpdateEcoUmbrella, UpdateSidePoloUmbrella, UpdateClassicUmbrella, UpdateSparePartsService, UpdateWoodenUmbrella, UpdateBeachUmbrella, GetOrderDeliveryList }

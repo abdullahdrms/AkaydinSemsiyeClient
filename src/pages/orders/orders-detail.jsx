@@ -227,7 +227,7 @@ export default function OrderDetail() {
                             <Button onClick={() => setPaymentModal(true)} sx={{ height: '46px', borderRadius: 1, pl: 3, pr: 3 }} color='success' size='small' variant="contained">Ödeme Ekle</Button>
                         </div>
 
-                        <PaymentTable isEdit={isEdit} setIsEdit={setIsEdit} id={params?.id} />
+                        <PaymentTable data={data?.orderDetails} isEdit={isEdit} setIsEdit={setIsEdit} id={params?.id} />
                     </Box>
                 </Grid>
                 <Grid marginTop={4.5} item xs={12}>

@@ -27,6 +27,8 @@ export default function OrderForm() {
 
     let totalPrice = 0
     let totalTaxPrice = 0
+    // let totalPayment = 0
+    const [totalPayment, setTotalPayment] = useState(0)
 
     const navigate = useNavigate()
     const [paymentModal, setPaymentModal] = useState(false)
@@ -34,8 +36,13 @@ export default function OrderForm() {
 
     useEffect(() => {
         setOrdersDetails([])
+        setTotalPayment(0)
         GetDetail(params?.id).then((res) => {
             setLoading(false)
+            res?.data?.payments?.map((payment) => {
+                // totalPayment = totalPayment + payment?.amount
+                setTotalPayment((prevValue) => parseInt(prevValue) + payment?.amount)
+            })
             if (res?.data) {
                 setData(res?.data)
                 res?.data?.orderDetails?.map((item) => {
@@ -191,14 +198,14 @@ export default function OrderForm() {
                                                 </td>
                                                 <td style={{ textAlign: 'start', padding: '8px' }}></td>
                                                 <td style={{ textAlign: 'start', padding: '8px' }}>ALINAN</td>
-                                                <td style={{ textAlign: 'start', padding: '8px' }}>0 TL</td>
+                                                <td style={{ textAlign: 'start', padding: '8px' }}>{totalPayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</td>
                                             </tr>
                                             <tr >
                                                 <td style={{ textAlign: 'start', padding: '8px' }}>
                                                 </td>
                                                 <td style={{ textAlign: 'start', padding: '8px' }}></td>
                                                 <td style={{ textAlign: 'start', padding: '8px', fontWeight: 'bold', fontSize: '18px' }}>KALAN TUTAR</td>
-                                                <td style={{ textAlign: 'start', padding: '8px', fontWeight: 'bold', fontSize: '18px' }}>3.000 TL</td>
+                                                <td style={{ textAlign: 'start', padding: '8px', fontWeight: 'bold', fontSize: '18px' }}>{((totalPrice + totalTaxPrice) - parseInt(totalPayment)).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") } TL</td>
                                             </tr>
                                         </tbody>
                                     </table>

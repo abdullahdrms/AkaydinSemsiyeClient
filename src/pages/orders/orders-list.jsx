@@ -273,7 +273,14 @@ export default function OrderList() {
             },
             {
                 header: 'Tutar',
-                cell: ({ row }) => { return `${row?.original?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL` }
+                cell: ({ row }) => {
+                    return (
+                        <div>
+                            <div style={{fontWeight: '600'}}>{row?.original?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</div>
+                            <div style={{color: '#f1416c',fontWeight: '600'}}>( {((parseFloat(row?.original?.price) - parseFloat(row?.original?.payment)).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL )</div>
+                        </div>
+                    )
+                }
             },
             {
                 header: 'Sipariş Tarihi',
