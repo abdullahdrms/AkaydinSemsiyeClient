@@ -93,6 +93,10 @@ const GetOrderDeliveryList = (fd) => {
     return post(`/Orders/GetOrderDeliveryList`, fd, true, true);
 }
 
+const GetListDeadline = (id) => {
+    return get(`/Orders/GetListDeadline`, true);
+}
 
 
-export { GetOrders, CreateOrder, GetDetail, UpdateOrder, CreateCamellia, CreateLuxuryUmbrella, CreateEcoUmbrella, CreateSidePoloUmbrella, CreateClassicUmbrella, CreateSparePartsService, CreateWoodenUmbrella, CreateBeachUmbrella, GetOrderDetail, DeleteUmrella, UpdateCamellia, UpdateLuxuryUmbrella, UpdateEcoUmbrella, UpdateSidePoloUmbrella, UpdateClassicUmbrella, UpdateSparePartsService, UpdateWoodenUmbrella, UpdateBeachUmbrella, GetOrderDeliveryList }
+
+export { GetOrders, CreateOrder, GetDetail, UpdateOrder, CreateCamellia, CreateLuxuryUmbrella, CreateEcoUmbrella, CreateSidePoloUmbrella, CreateClassicUmbrella, CreateSparePartsService, CreateWoodenUmbrella, CreateBeachUmbrella, GetOrderDetail, DeleteUmrella, UpdateCamellia, UpdateLuxuryUmbrella, UpdateEcoUmbrella, UpdateSidePoloUmbrella, UpdateClassicUmbrella, UpdateSparePartsService, UpdateWoodenUmbrella, UpdateBeachUmbrella, GetOrderDeliveryList ,GetListDeadline}

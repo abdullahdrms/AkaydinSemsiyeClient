@@ -5,6 +5,7 @@ import Container from '@mui/material/Container';
 // project imports
 import ContactForm from 'sections/extra-pages/contact/ContactForm';
 import ContactHeader from 'sections/extra-pages/contact/ContactHeader';
+import DeadlineList from 'sections/default/deadline-list';
 
 // ==============================|| CONTACT US - MAIN ||============================== //
 
@@ -12,12 +13,7 @@ export default function Default() {
   return (
     <Grid container spacing={12} justifyContent="center" alignItems="center" sx={{ mb: 12 }}>
       <Grid item xs={12} md={12}>
-        <ContactHeader />
-      </Grid>
-      <Grid item xs={12} sm={10} lg={9}>
-        <Container maxWidth="lg" sx={{ px: { xs: 0, sm: 2 } }}>
-          <ContactForm />
-        </Container>
+        <DeadlineList />
       </Grid>
     </Grid>
   );

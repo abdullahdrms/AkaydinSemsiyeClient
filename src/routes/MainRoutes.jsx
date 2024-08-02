@@ -31,6 +31,9 @@ import UpdateProduct from 'pages/orders/update-product';
 import DeliveryPrint from 'pages/orders/delivery-print';
 import WorkForm from 'pages/orders/work-form';
 import OrderForm from 'pages/orders/order-form';
+import StockList from 'pages/stock/stock-list';
+import MaterialList from 'pages/stock/material-list';
+import SemiFinishedList from 'pages/stock/semi-finished-list';
 
 
 const ErrorPage = Loadable(lazy(() => import('pages/error-pages/404')));
@@ -102,6 +105,23 @@ const MainRoutes = {
             {
               path: 'list',
               element: <ProductsList />
+            },
+          ]
+        },
+        {
+          path: '/stock',
+          children: [
+            {
+              path: 'stock-list',
+              element: <StockList />
+            },
+            {
+              path: 'material-list',
+              element: <MaterialList />
+            },
+            {
+              path: 'semi-finished-list',
+              element: <SemiFinishedList />
             },
           ]
         },

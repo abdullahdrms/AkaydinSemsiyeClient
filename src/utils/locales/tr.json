@@ -34,5 +34,9 @@
 
   "employees-group-title":"Personel Yönetimi",
   "employees-departments-list-title": "Departmanlar",
-  "employees-list-title": "Personeller"
+  "employees-list-title": "Personeller",
+  "stock-group-title": "Stok Yönetimi",
+   "stock-list-title" : "Stok Listesi",
+   "material-list-title": "Materyal Listesi",
+   "semi-finished-list-title": "Yarı Mamul Listesi"
 }
