@@ -69,7 +69,7 @@ function request(
     }
 
     try {
-      response = await fetch('http://v2.akaydinsemsiye.com/api' + url, options);
+      response = await fetch(import.meta.env.VITE_APP_API_URL + url, options);
       //console.log(response.body);
       result = await response.json();
     } catch (error) {

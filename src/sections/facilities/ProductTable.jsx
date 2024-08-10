@@ -58,7 +58,7 @@ export default function ProductTable({ data }) {
                         orderStatus: "",
                         qty: "",
                         price: "Kdv",
-                        total: `${parseFloat(totalTaxPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."))} TL`,
+                        total: `${totalTaxPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL`,
                         font: 'bold'
                     }
                     setRows((prevValues) => [...prevValues, data3])

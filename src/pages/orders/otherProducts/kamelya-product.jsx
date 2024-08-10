@@ -56,7 +56,8 @@ const getInitialValues = ({ data, update }) => {
         acrylicColor: 0,
         localColor: 0,
         fabricChartId: 0,
-        skeletonChartCode: 0
+        skeletonChartCode: 0,
+        orderDetailStatus: 0
     };
     const updateOrder = {
         shape: `${data?.shape}` || "",
@@ -91,6 +92,7 @@ const getInitialValues = ({ data, update }) => {
         localColor: `${data?.fabricChart?.colorType === 2 ? data?.fabricChart?.code : 0}` || "",
         fabricChartId: `${data?.fabricChart?.id}` || 0,
         skeletonChartCode: `${data?.skeletonChart?.code}` || 0,
+        orderDetailStatus: `${data?.orderDetailStatus}` || 0,
     };
     if (update) {
         return updateOrder
@@ -338,12 +340,13 @@ export default function KamelyaProduct({ update = false }) {
                 const fd = new FormData()
                 if (update) {
                     fd.append("Id", updateOrderId)
+                    fd.append("OrderDetailStatus", parseInt(formik.values.orderDetailStatus))
                 } else {
                     fd.append("OrderId", orderId)
+                    fd.append("OrderDetailStatus", 1)
                 }
                 fd.append("ProductId", 2)
                 fd.append("OrderDetailNote", formik.values.orderNote)
-                fd.append("OrderDetailStatus", 1)
                 fd.append("Qty", formik.values.qty)
                 fd.append("Tax", 1)
                 fd.append("TaxType", formik.values.taxType)
@@ -447,6 +450,25 @@ export default function KamelyaProduct({ update = false }) {
 
     let breadcrumbLinks = [{ title: 'Sipariş Yönetimi', to: '/orders/list' }, { title: 'Detay', to: `/orders/detail/${data?.orderId}` }, { title: 'Ürün Detayı', to: `/orders/detail/product-detail/${updateOrderId}` }, { title: 'Ürün Düzenle' }, { title: 'Kamelya', }]
 
+    const statusTypes = [
+        {
+            name: "Ürün Başladı",
+            id: 1
+        },
+        {
+            name: "Kumaş Hazır",
+            id: 2
+        },
+        {
+            name: "İskelet Hazır",
+            id: 3
+        },
+        {
+            name: "Ürün Hazır",
+            id: 4
+        }
+    ]
+
     if (loading)
         return (
             <Box sx={{ p: 5 }}>
@@ -467,6 +489,28 @@ export default function KamelyaProduct({ update = false }) {
                     <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
                         <DialogContent sx={{ p: 2.5 }}>
                             <Grid item xs={12} md={12}>
+
+                                {
+                                    update &&
+                                    <Grid style={{ marginBottom: '12px' }} item xs={12}>
+                                        <MainCard title='Sipariş Durumu'>
+                                            <Grid item marginBottom={3} xs={12}>
+                                                {/* <InputLabel sx={{ marginBottom: 2 }}>Müşteri Seçimi</InputLabel> */}
+                                                <Autocomplete
+                                                    disableClearable
+                                                    fullWidth
+                                                    id="basic-autocomplete-label"
+                                                    options={statusTypes}
+                                                    getOptionLabel={(option) => `${option?.name}`}
+                                                    isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                                                    onChange={(e, value) => { setFieldValue('orderDetailStatus', value?.id) }}
+                                                    value={statusTypes.find((item) => parseInt(item?.id) === parseInt(formik.values.orderDetailStatus))}
+                                                    renderInput={(params) => <TextField {...params} helperText={errors.orderDetailStatus} error={Boolean(errors.orderDetailStatus)} label="Lütfen Sipariş Durumu Seçiniz" />}
+                                                />
+                                            </Grid>
+                                        </MainCard>
+                                    </Grid>
+                                }
 
                                 <Grid style={{ marginBottom: '12px' }} item xs={12}>
                                     <MainCard title='Şekil Seçimi'>

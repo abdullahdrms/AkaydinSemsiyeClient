@@ -184,7 +184,7 @@ export default function OrderForm() {
                                                 </td>
                                                 <td style={{ textAlign: 'start', padding: '8px' }}></td>
                                                 <td style={{ textAlign: 'start', padding: '8px' }}>KDV</td>
-                                                <td style={{ textAlign: 'start', padding: '8px' }}>{parseFloat(totalTaxPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."))} TL</td>
+                                                <td style={{ textAlign: 'start', padding: '8px' }}>{totalTaxPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</td>
                                             </tr>
                                             <tr >
                                                 <td style={{ textAlign: 'start', padding: '8px' }}>

@@ -30,11 +30,12 @@ const getInitialValues = (data) => {
     customer: data?.customer?.id || 0,
     orderNo: data?.orderNumber,
     deliveryLocation: `${data?.deliveryLocation}`,
-    deliveryAdressId: data?.customerAddress || {},
+    deliveryAdressId: data?.customerAddress !== null ? data?.customerAddress : { title: 'Adres Seçin', id: 0 } || { title: 'Adres Seçin', id: 0 },
     deliveryType: `${data?.deliveryType}`,
     deadline: data?.deadline,
-    orderNote: data?.orderNote,
+    orderNote: data?.orderNote || "",
     deliveryDescription: data?.deliveryLocationText || "",
+    orderStatusType: data?.orderStatusType || 0
   };
   return newOrder;
 };
@@ -44,7 +45,12 @@ export default function FormOrderUpdate() {
   const params = useParams()
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
-  const [customerAddress, setCustomerAdress] = useState([]);
+  const [customerAddress, setCustomerAdress] = useState([
+    {
+      title: 'Adres Seçin',
+      id: 0
+    }
+  ]);
   const [deadlineDate, setDeadlineDate] = useState(new Date())
   const [data, setData] = useState([])
 
@@ -113,10 +119,11 @@ export default function FormOrderUpdate() {
         }
         fd.append('OrderNumber', formik.values.orderNo)
         fd.append('OrderNote', formik.values.orderNote)
-        fd.append('OrderStatusType', 1)
+        fd.append('OrderStatusType', formik.values.orderStatusType)
         fd.append('DeliveryLocation', formik.values.deliveryLocation)
         fd.append('CustomerId', formik.values.customer)
         fd.append('Id', params.id)
+
 
         await UpdateOrder(fd).then((res) => {
           if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
@@ -144,10 +151,14 @@ export default function FormOrderUpdate() {
 
   useEffect(() => {
     async function fetchData() {
+      setCustomerAdress([{
+        title: 'Adres Seçin',
+        id: 0
+      }])
       await GetDetail(params?.id).then((res) => {
         setData(res?.data)
         GetCustomerAdress(res?.data?.customer?.id).then((res3) => {
-          setCustomerAdress(res3?.data)
+          setCustomerAdress((prevValues) => [...prevValues, ...res3?.data])
         })
         GetAllCustomer().then((res2) => {
           setCustomers(res2?.data); setLoading(false);
@@ -157,14 +168,58 @@ export default function FormOrderUpdate() {
     fetchData()
   }, []);
 
-  useEffect(() => {
-    if (formik.values.customer !== 0) {
-      GetCustomerAdress(formik?.values?.customer).then((res) => {
-        setCustomerAdress(res?.data)
+  const handleChangeCustomer = (value) => {
+    async function fetchData() {
+      setCustomerAdress([{
+        title: 'Adres Seçin',
+        id: 0
+      }])
+      await GetCustomerAdress(value?.id).then((res) => {
+        setCustomerAdress((prevValues) => [...prevValues, ...res?.data])
       })
     }
+    if (formik.values.customer !== 0) {
+      fetchData()
+    }
+  }
 
-  }, [formik?.values?.customer])
+
+
+
+  const statusTypes = [
+    {
+      name: "Sipariş Oluşturuldu",
+      id: 1
+    },
+    {
+      name: "Sipariş Başladı",
+      id: 2
+    },
+    {
+      name: "Kısmi Hazır",
+      id: 3
+    },
+    {
+      name: "Teslime Hazır",
+      id: 4
+    },
+    {
+      name: "Teslim Edildi",
+      id: 5
+    },
+    {
+      name: "İptal Edildi",
+      id: 6
+    },
+    {
+      name: "Siparişi Bayi Oluşturdu",
+      id: 10
+    },
+    {
+      name: "Sipariş Onay Bekliyor",
+      id: 11
+    },
+  ]
 
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
@@ -183,6 +238,25 @@ export default function FormOrderUpdate() {
                 <Grid container spacing={3}>
 
                   <Grid item xs={12}>
+                    <MainCard title='Sipariş Durumu'>
+                      <Grid item marginBottom={3} xs={12}>
+                        {/* <InputLabel sx={{ marginBottom: 2 }}>Müşteri Seçimi</InputLabel> */}
+                        <Autocomplete
+                          disableClearable
+                          fullWidth
+                          id="basic-autocomplete-label"
+                          options={statusTypes}
+                          getOptionLabel={(option) => `${option?.name}`}
+                          isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                          onChange={(e, value) => { setFieldValue('orderStatusType', value?.id) }}
+                          value={statusTypes.find((item) => parseInt(item?.id) === parseInt(formik.values.orderStatusType))}
+                          renderInput={(params) => <TextField {...params} helperText={errors.orderStatusType} error={Boolean(errors.orderStatusType)} label="Lütfen Sipariş Durumu Seçiniz" />}
+                        />
+                      </Grid>
+                    </MainCard>
+                  </Grid>
+
+                  <Grid item xs={12}>
                     <MainCard title='Müşteri İşlemleri'>
                       <Grid item marginBottom={3} xs={12}>
                         <InputLabel sx={{ marginBottom: 2 }}>Müşteri Seçimi</InputLabel>
@@ -193,7 +267,7 @@ export default function FormOrderUpdate() {
                           options={customers}
                           getOptionLabel={(option) => `${option?.firstName} ${option?.lastName}`}
                           isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                          onChange={(e, value) => { setFieldValue('customer', value?.id); setFieldValue('deliveryAdressId', null) }}
+                          onChange={(e, value) => { setFieldValue('customer', value?.id); setFieldValue('deliveryAdressId', null); handleChangeCustomer(value) }}
                           value={customers.find((item) => item?.id === formik.values.customer)}
                           renderInput={(params) => <TextField {...params} helperText={errors.customer} error={Boolean(errors.customer)} label="Lütfen Müşteri Seçiniz" />}
                         />
@@ -286,7 +360,7 @@ export default function FormOrderUpdate() {
                               options={customerAddress}
                               getOptionLabel={(option) => `${option?.title}`}
                               isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                              onChange={(e, value) => setFieldValue('deliveryAdressId', value)}
+                              onChange={(e, value) => setFieldValue('deliveryAdressId', { title: value?.title, id: value?.id })}
                               value={formik.values.deliveryAdressId}
                               renderInput={(params) => <TextField {...params} helperText={errors.deliveryAdressId} error={Boolean(errors.deliveryAdressId)} label="Lütfen Müşteri Adresi Seçiniz" />}
                             />

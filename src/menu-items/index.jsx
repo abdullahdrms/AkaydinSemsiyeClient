@@ -5,10 +5,11 @@ import employees from './employees';
 import orders from './orders';
 import products from './products';
 import settings from './settings';
+import stats from './stats';
 import stock from './stock';
 
 const menuItems = {
-  items: [defaults, orders, products, stock, customers, settings]
+  items: [defaults, orders, products, stock,stats, customers, settings]
 };
 
 export default menuItems;

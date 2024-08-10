@@ -34,6 +34,9 @@ import OrderForm from 'pages/orders/order-form';
 import StockList from 'pages/stock/stock-list';
 import MaterialList from 'pages/stock/material-list';
 import SemiFinishedList from 'pages/stock/semi-finished-list';
+import MonthlyStat from 'pages/stats/monthly-stats';
+import YearlyStats from 'pages/stats/yearly-stats';
+import GeneralStats from 'pages/stats/general-stats';
 
 
 const ErrorPage = Loadable(lazy(() => import('pages/error-pages/404')));
@@ -106,6 +109,24 @@ const MainRoutes = {
               path: 'list',
               element: <ProductsList />
             },
+          ]
+        },
+        {
+          path: '/stats',
+          children: [
+            {
+              path: 'monthly',
+              element: <MonthlyStat />
+            },
+            {
+              path: 'yearly',
+              element: <YearlyStats />
+            },
+            {
+              path: 'general',
+              element: <GeneralStats />
+            },
+            
           ]
         },
         {
