@@ -46,10 +46,6 @@ export default function WorkForm() {
         })
     }, [])
 
-    useEffect(() => {
-        console.log(ordersDetails);
-    }, [ordersDetails])
-
 
     if (loading) return <Loader open={loading} />
 
@@ -114,18 +110,32 @@ export default function WorkForm() {
                                                     </thead>
                                                     <tbody style={{ width: '100%', textAlign: 'start' }}>
                                                         <tr>
-                                                            <td style={{ textAlign: 'start', padding: '8px' }}>{item?.qty}</td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.product?.name}</td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>
+                                                            <td style={{ width: '200px', textAlign: 'start', padding: '8px' }}>{item?.qty}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.product?.name}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>
                                                                 <div>En: {item?.width} mm</div>
                                                                 <div>Boy: {item?.height} mm</div>
                                                             </td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.fabricChart?.name}</td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.skeletonChart?.name}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.fabricChart?.name}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.skeletonChart?.name}</td>
+                                                        </tr>
+                                                        <tr style={{ borderSpacing: 0 }}>
+                                                            <th style={{ width: '200px', borderTop: '1px solid black', borderBottom: '1px solid black', textAlign: 'start', padding: '8px' }} scope="col">Ayak</th>
+                                                            <th style={{ width: '200px', borderTop: '1px solid black', borderLeft: '1px solid black',borderBottom: '1px solid black', textAlign: 'start', padding: '8px' }} scope="col">Saçak, Baskı, Cırt</th>
+                                                            <th style={{ width: '200px', borderTop: '1px solid black', borderLeft: '1px solid black',borderBottom: '1px solid black', textAlign: 'start', padding: '8px' }} scope="col">Sipariş Notu</th>
+                                                            <th style={{ width: '200px', borderTop: '1px solid black', borderLeft: '1px solid black',borderBottom: '1px solid black', textAlign: 'start', padding: '8px' }} scope="col"></th>
+                                                            <th style={{ width: '200px', borderTop: '1px solid black', borderLeft: '1px solid black',borderBottom: '1px solid black', textAlign: 'start', padding: '8px' }} scope="col"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={{ width: '200px', textAlign: 'start', padding: '8px' }}>{item?.standType === 1 ? "Ayaksız" : item?.standType === 2 ? "Mermer" : item?.standType === 3 ? "Flanş" : item?.standType === 4 ? "Beton" : item?.standType === 6 ? "Bidon" : item?.standType === 7 ? "Yere Montaj" : item?.standType === 8 ? "Mermere Montaj" : item?.standType === 9 ? "Özel" : ""}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}><span style={{ fontWeight: 'bold' }}>Saçak:</span>{item?.fringe === 1 ? "Yok" : "Var"}, <span style={{ fontWeight: 'bold' }}>Baskı:</span>{item?.print === 2 ? "Var," : "Yok,"} {item?.print === 2 && <span style={{ fontWeight: 'bold' }}>Baskı Köşe Sayısı:</span>} {item?.print === 2 && item?.printCornerCount + ","} {item?.printText !== null && <span style={{ fontWeight: 'bold' }}>Baskı Yazısı:</span>} {item?.printText !== null && item?.printText + ","} {<span style={{ fontWeight: 'bold' }}>Cırt:</span>} {item?.velcro === 2 ? "Var," : "Yok,"} {item?.velcro === 2 && <span style={{ fontWeight: 'bold' }}>Cırt Köşe Sayısı:</span>} { item?.velcro === 2 && item?.velcroCornerCount + ","} {item?.velcroText !== null  && <span style={{ fontWeight: 'bold' }}>Cırt Notları:</span>} {item?.velcroText !== null && item?.velcroText + ","} {item?.biasText !== null  && <span style={{ fontWeight: 'bold' }}>Biye Renk Notları:</span>} {item?.biasText !== null && item?.biasText}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.orderDetailNote === null ? "" : item?.orderDetailNote}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}></td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
-                                                <table style={{ width: '100%', borderSpacing: 0, borderLeft: '1px solid black', borderRight: '1px solid black', borderBottom: '1px solid black' }}>
+                                                {/* <table style={{ width: '100%', borderSpacing: 0, borderLeft: '1px solid black', borderRight: '1px solid black', borderBottom: '1px solid black' }}>
                                                     <thead style={{ width: '100%', textAlign: 'start', borderSpacing: 0 }}>
                                                         <tr style={{ borderSpacing: 0 }}>
                                                             <th style={{ width: '200px', borderBottom: '1px solid black', textAlign: 'start', padding: '8px' }} scope="col">Ayak</th>
@@ -137,14 +147,14 @@ export default function WorkForm() {
                                                     </thead>
                                                     <tbody style={{ width: '100%', textAlign: 'start' }}>
                                                         <tr>
-                                                            <td style={{ textAlign: 'start', padding: '8px' }}>{item?.standType === 1 ? "Ayaksız" : item?.standType === 2 ? "Mermer" : item?.standType === 3 ? "Flanş" : item?.standType === 4 ? "Beton" : item?.standType === 6 ? "Bidon" : item?.standType === 7 ? "Yere Montaj" : item?.standType === 8 ? "Mermere Montaj" : item?.standType === 9 ? "Özel" : ""}</td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.fringe === 1 ? "Yok" : "Var"}</td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.orderDetailNote === null ? "" : item?.orderDetailNote}</td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}></td>
-                                                            <td style={{ textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}></td>
+                                                            <td style={{ width: '200px', textAlign: 'start', padding: '8px' }}>{item?.standType === 1 ? "Ayaksız" : item?.standType === 2 ? "Mermer" : item?.standType === 3 ? "Flanş" : item?.standType === 4 ? "Beton" : item?.standType === 6 ? "Bidon" : item?.standType === 7 ? "Yere Montaj" : item?.standType === 8 ? "Mermere Montaj" : item?.standType === 9 ? "Özel" : ""}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}><span style={{ fontWeight: 'bold' }}>Saçak:</span>{item?.fringe === 1 ? "Yok" : "Var"}, <span style={{ fontWeight: 'bold' }}>Baskı:</span>{item?.print === 2 ? "Var," : "Yok,"} {item?.print === 2 && <span style={{ fontWeight: 'bold' }}>Baskı Köşe Sayısı:</span>} {item?.print === 2 && item?.printCornerCount + ","} {item?.printText !== null && <span style={{ fontWeight: 'bold' }}>Baskı Yazısı:</span>} {item?.printText !== null && item?.printText + ","} {<span style={{ fontWeight: 'bold' }}>Cırt:</span>} {item?.velcro === 2 ? "Var," : "Yok,"} {item?.velcro === 2 && <span style={{ fontWeight: 'bold' }}>Cırt Köşe Sayısı:</span>} { item?.velcro === 2 && item?.velcroCornerCount + ","} {item?.velcroText !== null  && <span style={{ fontWeight: 'bold' }}>Cırt Notları:</span>} {item?.velcroText !== null && item?.velcroText + ","} {item?.biasText !== null  && <span style={{ fontWeight: 'bold' }}>Biye Renk Notları:</span>} {item?.biasText !== null && item?.biasText}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}>{item?.orderDetailNote === null ? "" : item?.orderDetailNote}</td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}></td>
+                                                            <td style={{ width: '200px', textAlign: 'start', borderLeft: '1px solid black', padding: '8px' }}></td>
                                                         </tr>
                                                     </tbody>
-                                                </table>
+                                                </table> */}
                                             </div>
                                         )
                                     })

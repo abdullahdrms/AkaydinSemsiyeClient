@@ -9,7 +9,7 @@ import SimpleBar from 'components/third-party/SimpleBar';
 import AdressUpdateForm from './AdressUpdateForm';
 
 
-export default function AdressUpdateModal({ open, modalToggler, setIsEdit, customerId }) {
+export default function AdressUpdateModal({ open, modalToggler, setIsEdit, customerId,selectedAdress }) {
 
     const closeModal = () => modalToggler(false);
 
@@ -29,7 +29,7 @@ export default function AdressUpdateModal({ open, modalToggler, setIsEdit, custo
                         content={false}
                     >
                         <SimpleBar sx={{ maxHeight: `calc(100vh - 48px)`, '& .simplebar-content': { display: 'flex', flexDirection: 'column' } }}>
-                            <AdressUpdateForm closeModal={closeModal} setIsEdit={setIsEdit} customerId={customerId} />
+                            <AdressUpdateForm selectedAdress={selectedAdress} closeModal={closeModal} setIsEdit={setIsEdit} customerId={customerId} />
                         </SimpleBar>
                     </MainCard>
                 </Modal>

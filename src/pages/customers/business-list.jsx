@@ -71,7 +71,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                         placeholder={`Search ${data?.data?.length} records...`}
                     />
                     <Stack direction="row" alignItems="center" spacing={2}>
-                        <Button variant="contained" startIcon={<Add />} onClick={() => { navigate("/customers/add"); }} size="large">
+                        <Button variant="contained" startIcon={<Add />} onClick={() => { navigate("/customers/business/add"); }} size="large">
                             Bayi Ekle
                         </Button>
                     </Stack>
@@ -118,7 +118,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                                         <TableRow
                                             key={row.id}
                                             onClick={() => {
-                                                navigate(`/customers/detail/1`)
+                                                navigate(`/customers/detail/${row?.original?.id}`)
                                             }}
                                             style={{ cursor: 'pointer' }}
                                         >
@@ -199,7 +199,6 @@ export default function BusinessList() {
         () => [
             {
                 header: 'İsim Soyisim',
-                accessorKey: 'attributes.name',
                 cell: ({ row, getValue }) => (
                     <Stack direction="row" spacing={1.5} alignItems="center">
                         <Avatar
@@ -214,37 +213,44 @@ export default function BusinessList() {
                 )
             },
             {
-                header: 'Müşteri Tipi',
-                accessorKey: 'attributes.onlineReservation',
-                cell: (cell) => {
-                    if (cell.getValue()) return <Chip color="success" label="Aktif" size="small" variant="light" />;
-                    else return <Chip color="error" label="Pasif" size="small" variant="light" />;
-                    // switch (cell.getValue()) {
-                    //     case 3:
-                    //         return <Chip color="error" label="Rejected" size="small" variant="light" />;
-                    //     case 1:
-                    //         return <Chip color="success" label="Verified" size="small" variant="light" />;
-                    //     case 2:
-                    //     default:
-                    //         return <Chip color="info" label="Pending" size="small" variant="light" />;
-                    // }
-                }
-            },
-            {
-                header: 'Müşteri Durumu',
-                accessorKey: 'attributes.publishedAt',
-                cell: (cell) => {
-                    if (cell.getValue()) return <Chip color="success" label="Aktif" size="small" variant="light" />;
-                    else return <Chip color="error" label="Pasif" size="small" variant="light" />;
-                }
+                header: 'Firma Adı',
+                cell: ({ row, getValue }) => (
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Stack spacing={0}>
+                            <Typography variant="subtitle1">{row?.original?.companyName}</Typography>
+                        </Stack>
+                    </Stack>
+                )
             },
             {
                 header: 'Toplam Bakiye',
-                cell: ({ row }) => { return row?.original?.attributes?.person }
+                cell: ({ row, getValue }) => (
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Stack spacing={0}>
+                            <Typography variant="subtitle1">{row.original.totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</Typography>
+                        </Stack>
+                    </Stack>
+                )
             },
             {
                 header: 'Kalan Bakiye',
-                cell: ({ row }) => { return row?.original?.attributes?.region }
+                cell: ({ row, getValue }) => (
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Stack spacing={0}>
+                            <Typography variant="subtitle1">{row.original.totalPayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</Typography>
+                        </Stack>
+                    </Stack>
+                )
+            },
+            {
+                header: 'Durumu',
+                cell: ({ row }) => {
+                    switch (row?.original?.generalStatusType) {
+                        case 1: return <Chip color="success" label="Aktif" size="small" variant="light" />
+                        case 2: return <Chip color="error" label="Pasif" size="small" variant="light" />
+                        case 3: return <Chip color="error" label="Silinmiş" size="small" variant="light" />
+                    }
+                }
             },
             {
                 header: 'İşlemler',
@@ -271,7 +277,7 @@ export default function BusinessList() {
                                     color="primary"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        navigate(`/customers/update/${row?.original?.id}`)
+                                        navigate(`/customers/business/update/${row?.original?.id}`)
                                     }}
                                 >
                                     <Edit />

@@ -74,7 +74,6 @@ export default function BeachProduct({ update = false }) {
         const fetchData = async () => {
             if (update) {
                 await GetOrderDetail(updateOrderId).then((res) => {
-                    console.log(res);
                     setData(res?.data)
                 })
             }
@@ -134,7 +133,7 @@ export default function BeachProduct({ update = false }) {
                 fd.append("Price", formik.values.price)
                 fd.append("Fabric", formik.values.fabric)
                 if (parseInt(formik.values.fabric) === 3) {
-                    fd.append("FabricText", formik.values.fabric)
+                    fd.append("FabricText", formik.values.fabricText)
                 }
                 if (parseInt(formik.values.fabric) === 2) {
                     fd.append("FabricChartId", formik.values.fabricChartId)

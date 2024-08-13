@@ -62,7 +62,7 @@ export default function OrderDetail() {
                                     Sipariş Durumu
                                 </Typography>
                                 <Typography sx={{ textAlign: 'end' }} color='#7e86a6' variant="subtitle1" fontSize={15} component="span">
-                                    <Chip sx={{ borderRadius: 1, position: 'relative', top: 9 }} size="small" label={data?.orderStatusType === 1 ? 'Oluşturuldu' : data?.orderStatusType === 2 ? 'Başladı' : data?.orderStatusType === 3 ? 'Kısmi Hazır' : ''} variant="outlined" color={data?.orderStatusType === 1 ? 'success' : data?.orderStatusType === 2 ? 'success' : data?.orderStatusType === 3 ? 'warning' : 'error'} />
+                                    <Chip sx={{ borderRadius: 1, position: 'relative', top: 9 }} size="small" label={data?.orderStatusType === 1 ? 'Oluşturuldu' : data?.orderStatusType === 2 ? 'Başladı' : data?.orderStatusType === 3 ? 'Kısmi Hazır' : data?.orderStatusType === 4 ? 'Teslime Hazır' : data?.orderStatusType === 5 ? 'Teslim Edildi' : data?.orderStatusType === 6 ? 'İptal Edildi' : data?.orderStatusType === 10 ? 'Bayi Oluşturdu' : data?.orderStatusType === 11 ? 'Onay Bekliyor' : ''} variant="outlined" color={data?.orderStatusType === 1 ? 'success' : data?.orderStatusType === 2 ? 'success' : data?.orderStatusType === 3 ? 'info' : data?.orderStatusType === 4 ? 'success' : data?.orderStatusType === 5 ? 'success' : data?.orderStatusType === 6 ? 'error' : data?.orderStatusType === 10 ? 'primary' : data?.orderStatusType === 11 ? 'warning' : 'error'} />
                                 </Typography>
                             </Typography>
                             <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />

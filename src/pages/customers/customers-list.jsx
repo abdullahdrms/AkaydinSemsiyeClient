@@ -118,7 +118,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                                         <TableRow
                                             key={row.id}
                                             onClick={() => {
-                                                navigate(`/customers/detail/1`)
+                                                navigate(`/customers/detail/${row?.original?.id}`)
                                             }}
                                             style={{ cursor: 'pointer' }}
                                         >
@@ -214,28 +214,33 @@ export default function CustomersList() {
                 )
             },
             {
-                header: 'Müşteri Tipi',
-                accessorKey: 'attributes.onlineReservation',
-                cell: (cell) => {
-                    if (cell.getValue()) return <Chip color="success" label="Aktif" size="small" variant="light" />;
-                    else return <Chip color="error" label="Pasif" size="small" variant="light" />;
-                    // switch (cell.getValue()) {
-                    //     case 3:
-                    //         return <Chip color="error" label="Rejected" size="small" variant="light" />;
-                    //     case 1:
-                    //         return <Chip color="success" label="Verified" size="small" variant="light" />;
-                    //     case 2:
-                    //     default:
-                    //         return <Chip color="info" label="Pending" size="small" variant="light" />;
-                    // }
-                }
+                header: 'Toplam Bakiye',
+                cell: ({ row, getValue }) => (
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Stack spacing={0}>
+                            <Typography variant="subtitle1">{row.original.totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</Typography>
+                        </Stack>
+                    </Stack>
+                )
+            },
+            {
+                header: 'Kalan Bakiye',
+                cell: ({ row, getValue }) => (
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Stack spacing={0}>
+                            <Typography variant="subtitle1">{row.original.totalPayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</Typography>
+                        </Stack>
+                    </Stack>
+                )
             },
             {
                 header: 'Müşteri Durumu',
-                accessorKey: 'attributes.publishedAt',
-                cell: (cell) => {
-                    if (cell.getValue()) return <Chip color="success" label="Aktif" size="small" variant="light" />;
-                    else return <Chip color="error" label="Pasif" size="small" variant="light" />;
+                cell: ({ row }) => {
+                    switch (row?.original?.generalStatusType) {
+                        case 1: return <Chip color="success" label="Aktif" size="small" variant="light" />
+                        case 2: return <Chip color="error" label="Pasif" size="small" variant="light" />
+                        case 3: return <Chip color="error" label="Silinmiş" size="small" variant="light" />
+                    }
                 }
             },
             {

@@ -73,7 +73,11 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
         })
     }, [rowSelection])
 
-
+    const handleNavigate = (e, row) => {
+        if (e?.target?.type !== "checkbox") {
+            navigate(`/orders/detail/${row?.original?.id}`)
+        }
+    }
 
     return (
         <>
@@ -135,6 +139,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                                         <TableRow
                                             key={row.id}
                                             style={{ cursor: 'pointer' }}
+                                            onClick={(e) => handleNavigate(e, row)}
                                         >
                                             {row.getVisibleCells().map((cell) => (
                                                 <TableCell key={cell.id} {...cell.column.columnDef.meta}>
@@ -266,6 +271,16 @@ export default function OrderList() {
                             return <Chip color="success" label="Başladı" size="small" variant="light" />;
                         case 3:
                             return <Chip color="info" label="Kısmi Hazır" size="small" variant="light" />;
+                        case 4:
+                            return <Chip color="success" label="Teslime Hazır" size="small" variant="light" />;
+                        case 5:
+                            return <Chip color="success" label="Teslime Edildi" size="small" variant="light" />;
+                        case 6:
+                            return <Chip color="error" label="İptal Edildi" size="small" variant="light" />;
+                        case 10:
+                            return <Chip color="primary" label="Bayi Oluşturdu" size="small" variant="light" />;
+                        case 11:
+                            return <Chip color="warning" label="Onay Bekliyor" size="small" variant="light" />;
                         default:
                             return <Chip color="info" label="Pending" size="small" variant="light" />;
                     }
@@ -276,8 +291,8 @@ export default function OrderList() {
                 cell: ({ row }) => {
                     return (
                         <div>
-                            <div style={{fontWeight: '600'}}>{row?.original?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</div>
-                            <div style={{color: '#f1416c',fontWeight: '600'}}>( {((parseFloat(row?.original?.price) - parseFloat(row?.original?.payment)).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL )</div>
+                            <div style={{ fontWeight: '600' }}>{row?.original?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</div>
+                            <div style={{ color: '#f1416c', fontWeight: '600' }}>( {((parseFloat(row?.original?.price) - parseFloat(row?.original?.payment)).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL )</div>
                         </div>
                     )
                 }

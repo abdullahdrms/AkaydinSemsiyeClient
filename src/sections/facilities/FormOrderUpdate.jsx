@@ -22,22 +22,28 @@ import { GetAllCustomer } from 'services/customersServices';
 import Loader from 'components/Loader';
 import { GetCustomerAdress } from 'services/customersAdressServices';
 import { GetDetail, UpdateOrder } from 'services/ordersServices';
-import { calculateBusinessDays, calculateDaysBetweenDates, formatDate } from 'utils/custom/dateHelpers';
+import { calculateBusinessDays, calculateBusinessDaysGetDay, calculateBusinessDaysWithStart, calculateDaysBetweenDates, formatDate } from 'utils/custom/dateHelpers';
 
 // CONSTANT
 const getInitialValues = (data) => {
-  const newOrder = {
-    customer: data?.customer?.id || 0,
-    orderNo: data?.orderNumber,
-    deliveryLocation: `${data?.deliveryLocation}`,
-    deliveryAdressId: data?.customerAddress !== null ? data?.customerAddress : { title: 'Adres Seçin', id: 0 } || { title: 'Adres Seçin', id: 0 },
-    deliveryType: `${data?.deliveryType}`,
-    deadline: data?.deadline,
-    orderNote: data?.orderNote || "",
-    deliveryDescription: data?.deliveryLocationText || "",
-    orderStatusType: data?.orderStatusType || 0
-  };
-  return newOrder;
+  if (data?.createdAt && data?.deadline) {
+
+    let totalDay = calculateBusinessDaysGetDay(data.createdAt,data.deadline);
+
+    const newOrder = {
+      customer: data?.customer?.id || 0,
+      orderNo: data?.orderNumber,
+      deliveryLocation: `${data?.deliveryLocation}`,
+      deliveryAdressId: data?.customerAddress !== null ? data?.customerAddress : { title: 'Adres Seçin', id: 0 } || { title: 'Adres Seçin', id: 0 },
+      deliveryType: `${data?.deliveryType}`,
+      //deadline: formatCalculateDeadline(startDate, 7) === endDate ? 1 : formatCalculateDeadline(startDate, 14) === endDate ? 2 : 3,
+      deadline: totalDay == 7 ? 1 : totalDay == 14 ? 2 : 3,
+      orderNote: data?.orderNote || "",
+      deliveryDescription: data?.deliveryLocationText || "",
+      orderStatusType: data?.orderStatusType || 0
+    };
+    return newOrder;
+  }
 };
 
 export default function FormOrderUpdate() {
@@ -51,8 +57,10 @@ export default function FormOrderUpdate() {
       id: 0
     }
   ]);
-  const [deadlineDate, setDeadlineDate] = useState(new Date())
   const [data, setData] = useState([])
+  const [deadlineDate, setDeadlineDate] = useState(new Date())
+  
+
 
   const VillaSchema = Yup.object().shape({
     customer: Yup.number().moreThan(0, 'Bu alan zorunlu'),
@@ -80,17 +88,17 @@ export default function FormOrderUpdate() {
         return true
       }
     }),
-    deliveryDescription: Yup.string().test("isValid", "Bu alan zorunlu", (value) => {
-      if (parseInt(formik.values.deliveryLocation) === 1) {
-        if (value) {
-          return true
-        } else {
-          return false
-        }
-      } else {
-        return true
-      }
-    }),
+    // deliveryDescription: Yup.string().test("isValid", "Bu alan zorunlu", (value) => {
+    //   if (parseInt(formik.values.deliveryLocation) === 1) {
+    //     if (value) {
+    //       return true
+    //     } else {
+    //       return false
+    //     }
+    //   } else {
+    //     return true
+    //   }
+    // }),
     deadline: Yup.number().moreThan(0, "Bu alan zorunlu")
   });
 
@@ -123,6 +131,8 @@ export default function FormOrderUpdate() {
         fd.append('DeliveryLocation', formik.values.deliveryLocation)
         fd.append('CustomerId', formik.values.customer)
         fd.append('Id', params.id)
+
+        console.log(values);
 
 
         await UpdateOrder(fd).then((res) => {
@@ -157,6 +167,7 @@ export default function FormOrderUpdate() {
       }])
       await GetDetail(params?.id).then((res) => {
         setData(res?.data)
+        setDeadlineDate(new Date(res?.data?.deadline))
         GetCustomerAdress(res?.data?.customer?.id).then((res3) => {
           setCustomerAdress((prevValues) => [...prevValues, ...res3?.data])
         })
@@ -182,9 +193,6 @@ export default function FormOrderUpdate() {
       fetchData()
     }
   }
-
-
-
 
   const statusTypes = [
     {
@@ -220,7 +228,6 @@ export default function FormOrderUpdate() {
       id: 11
     },
   ]
-
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
 
@@ -267,7 +274,7 @@ export default function FormOrderUpdate() {
                           options={customers}
                           getOptionLabel={(option) => `${option?.firstName} ${option?.lastName}`}
                           isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                          onChange={(e, value) => { setFieldValue('customer', value?.id); setFieldValue('deliveryAdressId', null); handleChangeCustomer(value) }}
+                          onChange={(e, value) => { setFieldValue('customer', value?.id); setFieldValue('deliveryAdressId', { title: 'Adres Seçin', id: 0 }); handleChangeCustomer(value) }}
                           value={customers.find((item) => item?.id === formik.values.customer)}
                           renderInput={(params) => <TextField {...params} helperText={errors.customer} error={Boolean(errors.customer)} label="Lütfen Müşteri Seçiniz" />}
                         />
@@ -434,10 +441,10 @@ export default function FormOrderUpdate() {
                           <RadioGroup id='deadline' name="radio-deadline" row>
                             <Grid container spacing={3}>
                               <Grid item lg={3} xs={12}>
-                                <Box onClick={() => setFieldValue('deadline', "1")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.deadline ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                <Box onClick={() => setFieldValue('deadline', 1)} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.deadline ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
                                   <label htmlFor="">
                                     <span>
-                                      <input style={{ width: '20px', height: '20px' }} value="1" checked={formik.values.deadline === "1" ? true : false} onChange={(e) => setFieldValue('deadline', "1")} name='radio-deadline' type="radio" />
+                                      <input style={{ width: '20px', height: '20px' }} value="1" checked={parseInt(formik.values.deadline) === 1 ? true : false} onChange={(e) => setFieldValue('deadline', 1)} name='radio-deadline' type="radio" />
                                     </span>
                                     <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
                                       7 İş Günü
@@ -446,10 +453,10 @@ export default function FormOrderUpdate() {
                                 </Box>
                               </Grid>
                               <Grid item lg={3} xs={12}>
-                                <Box onClick={() => setFieldValue('deadline', "2")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.deadline ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                <Box onClick={() => setFieldValue('deadline', 2)} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.deadline ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
                                   <label htmlFor="">
                                     <span>
-                                      <input style={{ width: '20px', height: '20px' }} value="2" checked={formik.values.deadline === "2" ? true : false} onChange={(e) => setFieldValue('deadline', "2")} name='radio-deadline' type="radio" />
+                                      <input style={{ width: '20px', height: '20px' }} value="2" checked={parseInt(formik.values.deadline) === 2 ? true : false} onChange={(e) => setFieldValue('deadline', 2)} name='radio-deadline' type="radio" />
                                     </span>
                                     <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
                                       14 İş Günü
@@ -458,10 +465,10 @@ export default function FormOrderUpdate() {
                                 </Box>
                               </Grid>
                               <Grid item lg={3} xs={12}>
-                                <Box onClick={() => setFieldValue('deadline', "3")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.deadline ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                <Box onClick={() => setFieldValue('deadline', 3)} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.deadline ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
                                   <label htmlFor="">
                                     <span>
-                                      <input style={{ width: '20px', height: '20px' }} value="3" checked={formik.values.deadline === "3" ? true : false} onChange={(e) => setFieldValue('deadline', "3")} name='radio-deadline' type="radio" />
+                                      <input style={{ width: '20px', height: '20px' }} value="3" checked={parseInt(formik.values.deadline) === 3 ? true : false} onChange={(e) => setFieldValue('deadline', 3)} name='radio-deadline' type="radio" />
                                     </span>
                                     <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
                                       Özel

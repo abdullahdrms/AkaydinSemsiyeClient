@@ -14,6 +14,7 @@ import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import { DebouncedInput, HeaderSort, TablePagination } from 'components/third-party/react-table';
+import { ImagePath, getImageUrl } from 'utils/getImageUrl';
 import OrderModalDelete from 'sections/facilities/OrderModalDelete';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
@@ -22,19 +23,16 @@ import { Add, Edit, Eye, Trash } from 'iconsax-react';
 
 // custom
 import Loader from 'components/Loader';
-import { useNavigate, useParams } from 'react-router-dom';
-import AdressAddModal from 'sections/customers/AdressAddModal';
-import AdressUpdateModal from 'sections/customers/AdressUpdateModal';
-import { GetCustomerAdress } from 'services/customersAdressServices';
+import { useNavigate } from 'react-router-dom';
 
 // ==============================|| REACT TABLE - LIST ||============================== //
 const fallbackData = [];
-function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter, setAdressAddModal }) {
+function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter }) {
 
     const navigate = useNavigate();
 
     const table = useReactTable({
-        data: data?.data || fallbackData,
+        data: data || fallbackData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         onPaginationChange: setPagination,
@@ -69,11 +67,11 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                     <DebouncedInput
                         value={globalFilter ?? ''}
                         onFilterChange={(value) => setGlobalFilter(String(value))}
-                        placeholder={`Search ${data?.data?.length} records...`}
+                        placeholder={`Search ${data?.meta?.pagination?.total} records...`}
                     />
                     <Stack direction="row" alignItems="center" spacing={2}>
-                        <Button variant="contained" startIcon={<Add />} onClick={() => { setAdressAddModal(true) }} size="large">
-                            Adres Ekle
+                        <Button variant="contained" startIcon={<Add />} onClick={() => { navigate("/orders/add"); }} size="large">
+                            Sipariş Ekle
                         </Button>
                     </Stack>
                 </Stack>
@@ -119,7 +117,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                                         <TableRow
                                             key={row.id}
                                             onClick={() => {
-                                                // navigate(`/customers/detail/1`)
+                                                navigate(`/orders/detail/${row.original.id}`)
                                             }}
                                             style={{ cursor: 'pointer' }}
                                         >
@@ -155,10 +153,9 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
 }
 // ==============================|| CUSTOMER LIST ||============================== //
 
-export default function CustomersAddress() {
-    const theme = useTheme();
-    const params = useParams()
+export default function CustomerDetailOrderList({data}) {
     const navigate = useNavigate()
+    const theme = useTheme();
 
     const [sorting, setSorting] = useState([{ id: 'id', desc: true }]);
     const [globalFilter, setGlobalFilter] = useState('');
@@ -166,30 +163,18 @@ export default function CustomersAddress() {
     const [customerDeleteId, setCustomerDeleteId] = useState('');
     const [isDeleted, setIsDeleted] = useState(false)
     const [orderModalDelete, setOrderModalDelete] = useState(false);
-    const [adressAddModal, setAdressAddModal] = useState(false)
-    const [adressUpdateModal, setAdressUpdateModal] = useState(false)
-    const [isEdit, setIsEdit] = useState(false)
-    const [selectedAdress, setSelectedAdress] = useState({})
 
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10
     });
 
-    const [data, setData] = useState(() => []);
+    // const [data, setData] = useState(() => []);
 
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setLoading(true)
-        GetCustomerAdress(params.id).then((res) => {
-            if (res?.errors || res?.status === 400) {
-                navigate('/404')
-            } else {
-                setData(res);
-            }
-            setLoading(false);
-        })
+        setLoading(false)
     }, [pagination.pageIndex, pagination.pageSize, sorting, globalFilter]);
 
     useEffect(() => {
@@ -199,24 +184,9 @@ export default function CustomersAddress() {
     useEffect(() => {
         if (isDeleted) {
             setIsDeleted(false)
-            setLoading(true)
-            GetCustomerAdress(params.id).then((res) => {
-                setData(res);
-                setLoading(false);
-            })
+            setLoading(false)
         }
     }, [isDeleted])
-
-    useEffect(() => {
-        if (isEdit) {
-            setIsEdit(false)
-            setLoading(true)
-            GetCustomerAdress(params.id).then((res) => {
-                setData(res);
-                setLoading(false);
-            })
-        }
-    }, [isEdit])
 
     const handleClose = () => {
         setOrderModalDelete(!orderModalDelete);
@@ -225,47 +195,36 @@ export default function CustomersAddress() {
     const columns = useMemo(
         () => [
             {
-                header: 'Adres Başlığı',
-                accessorKey: 'title',
-                cell: ({ row, getValue }) => (
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                        <Stack spacing={0}>
-                            <Typography variant="subtitle1">{getValue()}</Typography>
-                        </Stack>
-                    </Stack>
-                )
+                header: 'Sipariş No',
+                cell: ({ row }) => { return row.original.orderNumber }
             },
             {
-                header: 'Adres',
-                cell: ({ row }) => (
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                        <Stack spacing={0}>
-                            <Typography variant="subtitle1">{row?.original?.address}</Typography>
-                        </Stack>
-                    </Stack>
-
-                )
-            },
-            {
-                header: 'Şehir / İlçe',
-                cell: ({ row }) => (
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                        <Stack spacing={0}>
-                            <Typography variant="subtitle1">{row?.original?.city?.name} / {row?.original?.state?.name}</Typography>
-                        </Stack>
-                    </Stack>
-
-                )
-            },
-            {
-                header: 'Adres Durumu',
-                accessorKey: 'attributes.publishedAt',
+                header: 'Sipariş Durumu',
+                accessorKey: 'orderStatusType',
                 cell: (cell) => {
-                    if (cell.getValue()) return <Chip color="success" label="Aktif" size="small" variant="light" />;
-                    else return <Chip color="error" label="Pasif" size="small" variant="light" />;
+                    switch (cell.getValue()) {
+                        case 1:
+                            return <Chip color="success" label="Oluşturuldu" size="small" variant="light" />;
+                        case 2:
+                            return <Chip color="success" label="Başladı" size="small" variant="light" />;
+                        case 3:
+                            return <Chip color="info" label="Kısmi Hazır" size="small" variant="light" />;
+                        default:
+                            return <Chip color="info" label="Pending" size="small" variant="light" />;
+                    }
                 }
             },
-
+            {
+                header: 'Tutar',
+                cell: ({ row }) => {
+                    return (
+                        <div>
+                            <div style={{ fontWeight: '600' }}>{row?.original?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</div>
+                            <div style={{ color: '#f1416c', fontWeight: '600' }}>( {((parseFloat(row?.original?.price) - parseFloat(row?.original?.payment)).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL )</div>
+                        </div>
+                    )
+                }
+            },
             {
                 header: 'İşlemler',
                 meta: {
@@ -281,18 +240,17 @@ export default function CustomersAddress() {
                         );
                     return (
                         <Stack direction="row" spacing={0}>
-                            {/* <Tooltip title="View">
+                            <Tooltip title="View">
                                 <IconButton color="secondary" onClick={row.getToggleExpandedHandler()}>
                                     {collapseIcon}
                                 </IconButton>
-                            </Tooltip> */}
+                            </Tooltip>
                             <Tooltip title="Edit">
                                 <IconButton
                                     color="primary"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setSelectedAdress(row?.original)
-                                        setAdressUpdateModal(true)
+                                        navigate(`/orders/update/${row?.original?.id}`)
                                     }}
                                 >
                                     <Edit />
@@ -317,13 +275,13 @@ export default function CustomersAddress() {
         ], // eslint-disable-next-line
         [theme]
     );
-    let breadcrumbLinks = [{ title: 'Müşteri Yönetimi' }, { title: 'Müşteri Adresleri' }];
+    // let breadcrumbLinks = [{ title: 'Müşteri Yönetimi' }, { title: 'Müşteriler', to: `/customers/list` }, { title: 'Müşteri Detayları'}];
 
     if (loading) return (<Loader open={loading} />)
 
     return (
         <>
-            <Breadcrumbs custom links={breadcrumbLinks} />
+            {/* <Breadcrumbs custom links={breadcrumbLinks} /> */}
             <ReactTable
                 {...{
                     data,
@@ -333,13 +291,10 @@ export default function CustomersAddress() {
                     setSorting,
                     sorting,
                     globalFilter,
-                    setGlobalFilter,
-                    setAdressAddModal
+                    setGlobalFilter
                 }}
             />
             <OrderModalDelete setIsDeleted={setIsDeleted} setLoading={setLoading} id={Number(customerDeleteId)} title={customerDeleteId} open={orderModalDelete} handleClose={handleClose} />
-            <AdressAddModal setIsEdit={setIsEdit} open={adressAddModal} modalToggler={setAdressAddModal} />
-            <AdressUpdateModal selectedAdress={selectedAdress} open={adressUpdateModal} modalToggler={setAdressUpdateModal} />
         </>
     );
 }

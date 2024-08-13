@@ -22,20 +22,20 @@ import { AddCustomer, GetCustomerDetail, UpdateCustomer } from 'services/custome
 // CONSTANT
 const getInitialValues = (data) => {
   const newOrder = {
-    customerType: 1,
+    customerType: 2,
     name: data?.firstName || '',
     surname: data?.lastName || '',
     phone: data?.phone || '',
     email: data?.email || '',
-    customerNote: data?.customerNote || ''
-    // companyName: data?.companyName || '',
-    // taxOffice: data?.taxAdmin || '',
-    // taxNo: data?.taxNumber || '',
+    customerNote: data?.customerNote || '',
+    companyName: data?.companyName || '',
+    taxOffice: data?.taxAdmin || '',
+    taxNo: data?.taxNumber || ''
   };
   return newOrder;
 };
 
-export default function FormCustomersAdd() {
+export default function FormBusinessUpdate() {
   const navigate = useNavigate();
   const params = useParams()
   const [data, setData] = useState([])
@@ -45,6 +45,10 @@ export default function FormCustomersAdd() {
     name: Yup.string().max(255).required('İsim zorunlu..'),
     surname: Yup.string().max(255).required('Soyisim zorunlu..'),
     phone: Yup.string().max(255).required('Telefon numarası zorunlu..'),
+    email: Yup.string().email("Lütfen geçerli email adresi giriniz").matches(/^(?!.*@[^,]*,)/).required("Email zorunlu"),
+    companyName: Yup.string().max(255).required('Firma adı zorunlu'),
+    taxOffice: Yup.string().max(255).required('Vergi dairesi zorunlu'),
+    taxNo: Yup.string().max(255).required('Vergi numarası zorunlu')
   });
 
   const formik = useFormik({
@@ -58,8 +62,11 @@ export default function FormCustomersAdd() {
         fd.append("LastName", formik.values.surname)
         fd.append("Phone", formik.values.phone)
         fd.append("Email", formik.values.email)
+        fd.append("CompanyName", formik.values.companyName)
+        fd.append("TaxAdmin", formik.values.taxOffice)
+        fd.append("TaxNumber", formik.values.taxNo)
         fd.append("CustomerNote", formik.values.customerNote)
-        fd.append("CustomerType", 1)
+        fd.append("CustomerType", 2)
         fd.append("Id", data?.id)
 
         await UpdateCustomer(fd).then((res) => {
@@ -76,7 +83,7 @@ export default function FormCustomersAdd() {
           } else {
             openSnackbar({
               open: true,
-              message: 'Müşteri başarıyla güncellendi!',
+              message: 'Bayi başarıyla güncellendi!',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -86,7 +93,6 @@ export default function FormCustomersAdd() {
             navigate(`/customers/detail/${res?.data?.id}`)
           }
         })
-
       } catch (error) {
         // console.error(error);
       }
@@ -95,11 +101,11 @@ export default function FormCustomersAdd() {
 
   useEffect(() => {
     GetCustomerDetail(params?.id).then((res) => {
-      if (res?.data?.customerType === 1) {
+      if (res?.data?.customerType === 2) {
         setData(res?.data)
         setLoading(false);
       } else {
-        navigate('/404')
+        navigate("/404")
       }
     })
   }, [])
@@ -123,6 +129,8 @@ export default function FormCustomersAdd() {
             <DialogContent sx={{ p: 2.5 }}>
               <Grid item xs={12} md={12}>
                 <Grid container spacing={3}>
+
+
 
                   <Grid item xs={12}>
                     <MainCard title='Müşteri Bilgileri'>
@@ -188,6 +196,45 @@ export default function FormCustomersAdd() {
                     </MainCard>
                   </Grid>
 
+                  <Grid item xs={12}>
+                    <MainCard title='Firma Bilgileri'>
+                      <Grid marginBottom={3} item xs={12}>
+                        <InputLabel sx={{ marginBottom: 2 }} htmlFor="companyName">Firma Adı</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="companyName"
+                          placeholder="Firma Adı"
+                          {...getFieldProps('companyName')}
+                          error={Boolean(touched.companyName && errors.companyName)}
+                          helperText={touched.companyName && errors.companyName}
+                        />
+                      </Grid>
+
+                      <Grid marginBottom={3} item xs={12}>
+                        <InputLabel sx={{ marginBottom: 2 }} htmlFor="taxOffice">Vergi Dairesi</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="taxOffice"
+                          placeholder="Vergi Dairesi"
+                          {...getFieldProps('taxOffice')}
+                          error={Boolean(touched.taxOffice && errors.taxOffice)}
+                          helperText={touched.taxOffice && errors.taxOffice}
+                        />
+                      </Grid>
+
+                      <Grid marginBottom={3} item xs={12}>
+                        <InputLabel sx={{ marginBottom: 2 }} htmlFor="taxNo">Vergi Numarası</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="taxNo"
+                          placeholder="Vergi Numarası"
+                          {...getFieldProps('taxNo')}
+                          error={Boolean(touched.taxNo && errors.taxNo)}
+                          helperText={touched.taxNo && errors.taxNo}
+                        />
+                      </Grid>
+                    </MainCard>
+                  </Grid>
                 </Grid>
               </Grid>
             </DialogContent>

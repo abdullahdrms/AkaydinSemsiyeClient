@@ -23,7 +23,7 @@ import { getCities, getState } from 'services/citiesServices';
 // CONSTANT
 const getInitialValues = () => {
   const newOrder = {
-    customerType: 1,
+    customerType: 2,
     name: '',
     surname: '',
     phone: '',
@@ -32,12 +32,15 @@ const getInitialValues = () => {
     adressTitle: '',
     city: 0,
     state: 0,
-    openAddress: ''
+    openAddress: '',
+    companyName: '',
+    taxOffice: '',
+    taxNo: ''
   };
   return newOrder;
 };
 
-export default function FormCustomersAdd() {
+export default function FormBusinessAdd() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [cities, setCities] = useState([])
@@ -62,38 +65,10 @@ export default function FormCustomersAdd() {
     name: Yup.string().max(255).required('İsim zorunlu..'),
     surname: Yup.string().max(255).required('Soyisim zorunlu..'),
     phone: Yup.string().max(255).required('Telefon numarası zorunlu..'),
-    // email: Yup.string().test("isValid", "Email zorunlu", (value) => {
-    //   if (parseInt(formik.values.customerType) === 2) {
-    //     if (formik.values.email !== "") {
-    //       return true
-    //     } else {
-    //       return false
-    //     }
-    //   } else {
-    //     return true
-    //   }
-    // }),
-    // companyName: Yup.string().test("isValid", "Firma adı zorunlu", (value) => {
-    //   if (parseInt(formik.values.customerType) === 2 && !(value)) {
-    //     return false
-    //   } else {
-    //     return true
-    //   }
-    // }),
-    // taxOffice: Yup.string().test("isValid", "Vergi dairesi zorunlu", (value) => {
-    //   if (parseInt(formik.values.customerType) === 2 && !(value)) {
-    //     return false
-    //   } else {
-    //     return true
-    //   }
-    // }),
-    // taxNo: Yup.string().test("isValid", "Vergi numarası zorunlu", (value) => {
-    //   if (parseInt(formik.values.customerType) === 2 && !(value)) {
-    //     return false
-    //   } else {
-    //     return true
-    //   }
-    // }),
+    email: Yup.string().email("Lütfen geçerli email adresi giriniz").matches(/^(?!.*@[^,]*,)/).required("Email zorunlu"),
+    companyName: Yup.string().max(255).required('Firma adı zorunlu'),
+    taxOffice: Yup.string().max(255).required('Vergi dairesi zorunlu'),
+    taxNo: Yup.string().max(255).required('Vergi numarası zorunlu'),
   });
 
   const formik = useFormik({
@@ -121,14 +96,14 @@ export default function FormCustomersAdd() {
           fd.append("Address", formik.values.openAddress)
         }
 
-        // if (parseInt(formik.values.customerType) === 2) {
-        //   fd.append("CompanyName", formik.values.companyName)
-        //   fd.append("TaxAdmin", formik.values.taxOffice)
-        //   fd.append("TaxNumber", formik.values.taxNo)
-        // }
+
+        fd.append("CompanyName", formik.values.companyName)
+        fd.append("TaxAdmin", formik.values.taxOffice)
+        fd.append("TaxNumber", formik.values.taxNo)
+
 
         fd.append("CustomerNote", formik.values.customerNote)
-        fd.append("CustomerType", 1)
+        fd.append("CustomerType", 2)
 
         await AddCustomer(fd).then((res) => {
           if (res.errors || res.statusCode === 400) {
@@ -367,48 +342,47 @@ export default function FormCustomersAdd() {
                       </Grid>
                     </MainCard>
                   </Grid>
-                  {/* {
-                    parseInt(formik.values.customerType) === 2 &&
-                    <Grid item xs={12}>
-                      <MainCard title='Firma Bilgileri'>
-                        <Grid marginBottom={3} item xs={12}>
-                          <InputLabel sx={{ marginBottom: 2 }} htmlFor="companyName">Firma Adı</InputLabel>
-                          <TextField
-                            fullWidth
-                            id="companyName"
-                            placeholder="Firma Adı"
-                            {...getFieldProps('companyName')}
-                            error={Boolean(touched.companyName && errors.companyName)}
-                            helperText={touched.companyName && errors.companyName}
-                          />
-                        </Grid>
 
-                        <Grid marginBottom={3} item xs={12}>
-                          <InputLabel sx={{ marginBottom: 2 }} htmlFor="taxOffice">Vergi Dairesi</InputLabel>
-                          <TextField
-                            fullWidth
-                            id="taxOffice"
-                            placeholder="Vergi Dairesi"
-                            {...getFieldProps('taxOffice')}
-                            error={Boolean(touched.taxOffice && errors.taxOffice)}
-                            helperText={touched.taxOffice && errors.taxOffice}
-                          />
-                        </Grid>
+                  <Grid item xs={12}>
+                    <MainCard title='Firma Bilgileri'>
+                      <Grid marginBottom={3} item xs={12}>
+                        <InputLabel sx={{ marginBottom: 2 }} htmlFor="companyName">Firma Adı</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="companyName"
+                          placeholder="Firma Adı"
+                          {...getFieldProps('companyName')}
+                          error={Boolean(touched.companyName && errors.companyName)}
+                          helperText={touched.companyName && errors.companyName}
+                        />
+                      </Grid>
 
-                        <Grid marginBottom={3} item xs={12}>
-                          <InputLabel sx={{ marginBottom: 2 }} htmlFor="taxNo">Vergi Numarası</InputLabel>
-                          <TextField
-                            fullWidth
-                            id="taxNo"
-                            placeholder="Vergi Numarası"
-                            {...getFieldProps('taxNo')}
-                            error={Boolean(touched.taxNo && errors.taxNo)}
-                            helperText={touched.taxNo && errors.taxNo}
-                          />
-                        </Grid>
-                      </MainCard>
-                    </Grid>
-                  } */}
+                      <Grid marginBottom={3} item xs={12}>
+                        <InputLabel sx={{ marginBottom: 2 }} htmlFor="taxOffice">Vergi Dairesi</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="taxOffice"
+                          placeholder="Vergi Dairesi"
+                          {...getFieldProps('taxOffice')}
+                          error={Boolean(touched.taxOffice && errors.taxOffice)}
+                          helperText={touched.taxOffice && errors.taxOffice}
+                        />
+                      </Grid>
+
+                      <Grid marginBottom={3} item xs={12}>
+                        <InputLabel sx={{ marginBottom: 2 }} htmlFor="taxNo">Vergi Numarası</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="taxNo"
+                          placeholder="Vergi Numarası"
+                          {...getFieldProps('taxNo')}
+                          error={Boolean(touched.taxNo && errors.taxNo)}
+                          helperText={touched.taxNo && errors.taxNo}
+                        />
+                      </Grid>
+                    </MainCard>
+                  </Grid>
+
                 </Grid>
               </Grid>
             </DialogContent>

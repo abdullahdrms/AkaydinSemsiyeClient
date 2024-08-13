@@ -37,6 +37,8 @@ import SemiFinishedList from 'pages/stock/semi-finished-list';
 import MonthlyStat from 'pages/stats/monthly-stats';
 import YearlyStats from 'pages/stats/yearly-stats';
 import GeneralStats from 'pages/stats/general-stats';
+import BusinessAdd from 'pages/customers/business-add';
+import BusinessUpdate from 'pages/customers/business-update';
 
 
 const ErrorPage = Loadable(lazy(() => import('pages/error-pages/404')));
@@ -126,7 +128,7 @@ const MainRoutes = {
               path: 'general',
               element: <GeneralStats />
             },
-            
+
           ]
         },
         {
@@ -162,12 +164,20 @@ const MainRoutes = {
               element: <CustomersAdd />
             },
             {
+              path: 'business/add',
+              element: <BusinessAdd />
+            },
+            {
               path: 'detail/:id',
               element: <CustomersDetail />
             },
             {
               path: 'update/:id',
               element: <CustomersUpdate />
+            },
+            {
+              path: "business/update/:id",
+              element: <BusinessUpdate />
             },
             {
               path: 'addresses/:id',

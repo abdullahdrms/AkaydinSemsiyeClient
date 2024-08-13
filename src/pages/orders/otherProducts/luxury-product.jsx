@@ -462,6 +462,9 @@ export default function LuxuryProduct({ update = false }) {
                     fd.append("Width", formik.values.width)
                     fd.append("Height", formik.values.heigth)
                 }
+                if (parseInt(formik.values.shape) === 3) {
+                    fd.append("Diameter", formik.values.diameter)
+                }
                 fd.append("Flue", formik.values.flue)
                 fd.append("SkeletonChartId", formik.values.skeletonChartId)
                 fd.append("SkeletonChartCode", 1032)

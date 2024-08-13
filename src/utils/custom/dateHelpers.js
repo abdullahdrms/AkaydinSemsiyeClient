@@ -34,6 +34,22 @@ const formatDate = (date) => {
   return `${day}-${month}-${year}`;
 };
 
+
+const calculateBusinessDaysGetDay = (startDate,endDate) => {
+
+  let geciciT = new Date(startDate);
+  let totalDay = 0;
+
+  while (geciciT <= new Date(endDate)) {
+    geciciT.setDate(geciciT.getDate() + 1);
+    if (geciciT.getDay() !== 0 && geciciT.getDay() !== 6) {
+      totalDay++;
+    }
+  }
+
+  return totalDay;
+};
+
 const calculateBusinessDays = (days) => {
   let currentDate = new Date();
   let addedDays = 0;
@@ -73,4 +89,4 @@ const calculateDaysBetweenDates = (date1) => {
   return diffInDays;
 };
 
-export { days, dateToString, stringToDate, formatDate, calculateBusinessDays, calculateDaysBetweenDates, calculateBusinessDaysWithStart };
+export { days, dateToString, stringToDate, formatDate, calculateBusinessDays, calculateDaysBetweenDates, calculateBusinessDaysWithStart,calculateBusinessDaysGetDay };

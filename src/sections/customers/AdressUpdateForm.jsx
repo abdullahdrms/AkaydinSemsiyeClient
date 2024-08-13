@@ -15,26 +15,55 @@ import moment from 'moment';
 // project imports
 import { useParams } from 'react-router';
 import { openSnackbar } from 'api/snackbar';
+import Loader from 'components/Loader';
+import { getCities, getState } from 'services/citiesServices';
 
 
-const getInitialValues = () => {
+const getInitialValues = (selectedAdress) => {
     const newPriceDate = {
-        adressTitle: '',
-        openAddress: ''
+        adressTitle: selectedAdress?.title || '',
+        openAddress: selectedAdress?.address || '',
+        city: selectedAdress?.cityId || 0,
+        state: selectedAdress?.stateId || 0
     };
     return newPriceDate;
 };
 
-export default function AdressUpdateForm({ closeModal, setIsEdit, customerId }) {
+export default function AdressUpdateForm({ closeModal, setIsEdit, customerId, selectedAdress }) {
+    const [loading, setLoading] = useState(true)
+    const [cities, setCities] = useState([])
+    const [states, setStates] = useState([
+        {
+            id: 0,
+            name: "İlçe Seçiniz"
+        }
+    ])
+
     const params = useParams();
     const validationSchema = Yup.object({
         // amount: Yup.number().min(1).required('Lütfen tutar yazınız..'),
         // paymentType: Yup.string().max(255).required('Lütfen ödemenin alındığı kasa hesabını seçiniz..')
     });
 
+    useEffect(() => {
+        async function fetchData() {
+            setStates([{
+                id: 0,
+                name: "İlçe Seçiniz"
+            }])
+            await getCities().then((res) => {
+                setCities(res?.data)
+            })
+            await getState(formik.values.city).then((res) => {
+                setStates((prevValue) => [...prevValue, ...res?.data])
+            })
+            setLoading(false)
+        }
+        fetchData()
+    }, [])
 
     const formik = useFormik({
-        initialValues: getInitialValues(),
+        initialValues: getInitialValues(selectedAdress),
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: async (values, { setSubmitting }) => {
@@ -47,7 +76,26 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId }) 
         }
     });
 
-    const { handleChange, handleSubmit, isSubmitting, getFieldProps, touched, errors } = formik;
+    // useEffect(() => {
+
+    // }, [formik.values.city])
+
+    const handleChangeState = (value) => {
+        async function fetchData() {
+            setStates([{
+                id: 0,
+                name: "İlçe Seçiniz"
+            }])
+            await getState(formik.values.city).then((res) => {
+                setStates((prevValue) => [...prevValue, ...res?.data])
+            })
+        }
+        fetchData()
+    }
+
+    const { handleChange, handleSubmit, isSubmitting, getFieldProps, touched, errors, setFieldValue } = formik;
+
+    if (loading) return <Loader open={loading} />
 
     return (
         <>
@@ -75,8 +123,12 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId }) 
                                         <Autocomplete
                                             fullWidth
                                             disablePortal
+                                            disableClearable
                                             id="basic-autocomplete-label"
-                                            options={['İstanbul', 'Bursa']}
+                                            options={cities}
+                                            onChange={(e, value) => { setFieldValue('city', value.id); setFieldValue('state', 0); handleChangeState(value) }}
+                                            value={cities.find((item) => item?.id === formik.values.city)}
+                                            getOptionLabel={(option) => option.name}
                                             renderInput={(params) => <TextField {...params} label="İl" />}
                                         />
                                     </Grid>
@@ -87,7 +139,17 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId }) 
                                             fullWidth
                                             disablePortal
                                             id="basic-autocomplete-label"
-                                            options={['Çekmeköy', 'Kadıköy']}
+                                            options={states}
+                                            disableClearable
+                                            onChange={(e, value) => { setFieldValue('state', value.id) }}
+                                            getOptionLabel={(option) => option.name}
+                                            value={states.find((item) => {
+                                                if (item?.id === formik.values.state) {
+                                                    return item
+                                                } else if (formik.values.state === 0) {
+                                                    return undefined
+                                                }
+                                            })}
                                             renderInput={(params) => <TextField {...params} label="İlçe" />}
                                         />
                                     </Grid>

@@ -389,6 +389,9 @@ export default function SidePoloProduct({ update = false }) {
                 if (parseInt(formik.values.shape) === 1) {
                     fd.append("ShapeSizeType", formik.values.shapeSizeType)
                 }
+                if (parseInt(formik.values.shape) === 3) {
+                    fd.append("Diameter", formik.values.diameter)
+                }
                 if (parseInt(formik.values.shape) === 4) {
                     fd.append("Width", formik.values.width)
                     fd.append("Height", formik.values.heigth)

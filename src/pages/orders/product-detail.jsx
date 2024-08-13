@@ -65,7 +65,7 @@ export default function ProductDetail() {
                                     Sipariş Durumu
                                 </Typography>
                                 <Typography sx={{ textAlign: 'end' }} color='#7e86a6' variant="subtitle1" fontSize={15} component="span">
-                                    <Chip sx={{ borderRadius: 1, position: 'relative', top: '-2px' }} size="small" label={data?.orderDetailStatus === 1 ? 'Oluşturuldu' : data?.orderDetailStatus === 2 ? 'Başladı' : data?.orderDetailStatus === 3 ? 'Kısmi Hazır' : ''} variant="outlined" color={data?.orderDetailStatus === 1 ? 'success' : data?.orderDetailStatus === 2 ? 'success' : data?.orderDetailStatus === 3 ? 'warning' : 'error'} />
+                                    <Chip size='small' sx={{ borderRadius: 1 }} label={data?.orderDetailStatus === 1 ? 'Ürün Başladı' : data?.orderDetailStatus === 2 ? 'Kumaş Hazır' : data?.orderDetailStatus === 3 ? 'İskelet Hazır' : data?.orderDetailStatus === 4 ? "Ürün Hazır" : ''} color={data?.orderDetailStatus === 1 ? 'primary' : data?.orderDetailStatus === 2 ? 'info' : data?.orderDetailStatus === 3 ? 'secondary' : data?.orderDetailStatus === 4 ? "success" : 'warning'} />
                                 </Typography>
                             </Typography>
                             <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
@@ -200,15 +200,34 @@ export default function ProductDetail() {
                                         </Typography>
                                     </>
                                 }
-                                <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
-                                <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
-                                    <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
-                                        Baca Bilgileri
-                                    </Typography>
-                                    <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
-                                        {data?.flue === 1 ? "Yok" : data?.flue === 2 ? "Bacalı" : data?.flue === 3 ? "Havalandırmalı" : ""}
-                                    </Typography>
-                                </Typography>
+                                {
+                                    data?.flue > 0 &&
+                                    <>
+                                        <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
+                                        <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
+                                            <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
+                                                Baca Bilgileri
+                                            </Typography>
+                                            <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
+                                                {data?.flue === 1 ? "Yok" : data?.flue === 2 ? "Bacalı" : data?.flue === 3 ? "Havalandırmalı" : ""}
+                                            </Typography>
+                                        </Typography>
+                                    </>
+                                }
+                                {
+                                    data?.body > 0 &&
+                                    <>
+                                        <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
+                                        <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
+                                            <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
+                                                Gövde
+                                            </Typography>
+                                            <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
+                                                {data?.body === 1 ? "15 x 25 50'lik Boru" : data?.body === 2 ? "20 x 30 60'lık Boru" : ''}
+                                            </Typography>
+                                        </Typography>
+                                    </>
+                                }
                             </Box>
                         </Grid>
                     }
@@ -262,7 +281,7 @@ export default function ProductDetail() {
                                             </Typography>
                                         </Typography>
                                         <Box component="section" sx={{ width: '100%', marginTop: '30px', height: '258px', cursor: 'pointer', borderRadius: 1, border: '1px dashed grey', '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
-                                            <img style={{objectFit: 'contain'}} width="100%" height="100%" src={`/img/${data?.fabricChart?.colorType === 1 ? "acrylic" : "local"}/${data?.fabricChart?.colorType === 1 ? "acrilla" : "local"}-${data?.fabricChart?.code}.jpg`} alt="" />
+                                            <img style={{ objectFit: 'contain' }} width="100%" height="100%" src={`/img/${data?.fabricChart?.colorType === 1 ? "acrylic" : "local"}/${data?.fabricChart?.colorType === 1 ? "acrilla" : "local"}-${data?.fabricChart?.code}.jpg`} alt="" />
                                         </Box>
                                     </>
                                 }
@@ -461,7 +480,7 @@ export default function ProductDetail() {
                                         <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
                                         <Typography sx={{ marginTop: 2.5, display: 'block', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
                                             <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
-                                                Saçak Renk Notları {"=>"} {" "}
+                                                Biye Renk Notları {"=>"} {" "}
                                             </Typography>
                                             <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
                                                 {data?.biasText}
@@ -469,15 +488,6 @@ export default function ProductDetail() {
                                         </Typography>
                                     </>
                                 }
-                                <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
-                                <Typography sx={{ marginTop: 2.5, display: 'block', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
-                                    <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
-                                        Saçak Renk Notları {"=>"} {" "}
-                                    </Typography>
-                                    <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
-                                        {data?.biasText}
-                                    </Typography>
-                                </Typography>
                             </Box>
                         </Grid>
                     }
@@ -538,6 +548,48 @@ export default function ProductDetail() {
                                         </Typography>
                                     </>
                                 }
+                            </Box>
+                        </Grid>
+                    }
+                    {
+                        data?.curtain !== 0 &&
+                        <Grid item xs={12} lg={6}>
+                            <Box sx={{ bgcolor: 'white', p: 3, borderRadius: 1, height: '100%' }}>
+                                <Typography variant="h4" component="h4">
+                                    Perde Bilgileri
+                                </Typography>
+                                <Typography sx={{ marginTop: 4, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
+                                    <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
+                                        Perde
+                                    </Typography>
+                                    <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
+                                        {data?.curtain === 1 ? "Yok" : data?.led === 2 ? "Var" : ""}
+                                    </Typography>
+                                </Typography>
+                                {
+                                    data?.curtain === 2 &&
+                                    <>
+                                        <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
+                                        <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
+                                            <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
+                                                Perde Adet
+                                            </Typography>
+                                            <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
+                                                {data?.curtainQty}
+                                            </Typography>
+                                        </Typography>
+                                    </>
+                                }
+
+                                <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
+                                <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
+                                    <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
+                                        Perde Notları {"=>"} {" "}
+                                    </Typography>
+                                    <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
+                                        {data?.curatinText}
+                                    </Typography>
+                                </Typography>
                             </Box>
                         </Grid>
                     }

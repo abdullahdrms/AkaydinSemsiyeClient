@@ -17,8 +17,8 @@ export default function ProductTable({ data }) {
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
 
-    function navigateHandle (row) {
-        if(row?.id) {
+    function navigateHandle(row) {
+        if (row?.id) {
             navigate(`/orders/detail/product-detail/${row?.id}`)
         }
     }
@@ -33,7 +33,7 @@ export default function ProductTable({ data }) {
                 const data1 = {
                     id: item?.id,
                     name: item?.product?.name,
-                    orderStatus: <Chip key={i} size='small' sx={{ borderRadius: 1 }} label="Ürün Başladı" color="warning" />,
+                    orderStatus: <Chip key={i} size='small' sx={{ borderRadius: 1 }} label={item?.orderDetailStatus === 1 ? 'Ürün Başladı' : item?.orderDetailStatus === 2 ? 'Kumaş Hazır' : item?.orderDetailStatus === 3 ? 'İskelet Hazır' : item?.orderDetailStatus === 4 ? "Ürün Hazır" : ''} color={item?.orderDetailStatus === 1 ? 'primary' : item?.orderDetailStatus === 2 ? 'info' : item?.orderDetailStatus === 3 ? 'secondary' : item?.orderDetailStatus === 4 ? "success" : 'warning'} />,
                     qty: item?.qty,
                     price: item?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' TL',
                     total: (item?.price * item?.qty).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' TL',
@@ -95,7 +95,7 @@ export default function ProductTable({ data }) {
                         </TableHead>
                         <TableBody>
                             {rows.map((row, i) => (
-                                <TableRow style={{cursor: 'pointer'}} onClick={() => navigateHandle(row)} key={i}>
+                                <TableRow style={{ cursor: 'pointer' }} onClick={() => navigateHandle(row)} key={i}>
                                     <TableCell style={{ display: `${row?.icon ? 'flex' : 'table-cell'}`, alignItems: `${row?.icon ? 'center' : 'normal'}`, gap: `${row?.icon ? '15px' : '0px'}` }} component="th" scope="row">
                                         {
                                             row?.icon &&

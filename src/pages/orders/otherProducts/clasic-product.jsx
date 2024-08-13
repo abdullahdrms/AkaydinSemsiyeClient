@@ -370,7 +370,17 @@ export default function ClasicProduct({ update = false }) {
         qty: Yup.number().moreThan(0, 'Bu alan zorunlu ve 0 dan büyük olmalı'),
         price: Yup.number().moreThan(0, 'Bu alan zorunlu ve 0 dan büyük olmalı'),
         taxType: Yup.string().required('bu alan zorunlu'),
-        body: Yup.string().required('bu alan zorunlu')
+        body: Yup.string().test("isValid", "Bu alan zorunlu", (value) => {
+            if (parseInt(formik.values.shape) === 2) {
+                if (parseInt(value) === 2) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return true
+            }
+        }),
     });
 
     const formik = useFormik({
@@ -396,8 +406,11 @@ export default function ClasicProduct({ update = false }) {
                 fd.append("TaxType", formik.values.taxType)
                 fd.append("Price", formik.values.price)
                 fd.append("Shape", formik.values.shape)
-                if (parseInt(formik.values.shape) === 1) {
+                if (parseInt(formik.values.shape) === 1 || parseInt(formik.values.shape) === 2) {
                     fd.append("ShapeSizeType", formik.values.shapeSizeType)
+                }
+                if (parseInt(formik.values.shape) === 3) {
+                    fd.append("Diameter", formik.values.diameter)
                 }
                 if (parseInt(formik.values.shape) === 4) {
                     fd.append("Width", formik.values.width)
