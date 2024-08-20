@@ -57,10 +57,6 @@ export default function OrderForm() {
         })
     }, [])
 
-    useEffect(() => {
-        console.log(ordersDetails);
-    }, [ordersDetails])
-
 
     if (loading) return <Loader open={loading} />
 

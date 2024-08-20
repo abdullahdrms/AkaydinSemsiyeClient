@@ -17,6 +17,7 @@ import { useParams } from 'react-router';
 import { openSnackbar } from 'api/snackbar';
 import Loader from 'components/Loader';
 import { getCities, getState } from 'services/citiesServices';
+import { UpdateCustomerAdress } from 'services/customersAdressServices';
 
 
 const getInitialValues = (selectedAdress) => {
@@ -41,8 +42,10 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId, se
 
     const params = useParams();
     const validationSchema = Yup.object({
-        // amount: Yup.number().min(1).required('Lütfen tutar yazınız..'),
-        // paymentType: Yup.string().max(255).required('Lütfen ödemenin alındığı kasa hesabını seçiniz..')
+        adressTitle: Yup.string().required('Adres başlıgı zorunlu'),
+        city: Yup.number().moreThan(0, 'Şehir zorunlu'),
+        state: Yup.number().moreThan(0, 'İlçe zorunlu'),
+        openAddress: Yup.string().required('Adres zorunlu'),
     });
 
     useEffect(() => {
@@ -68,8 +71,40 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId, se
         enableReinitialize: true,
         onSubmit: async (values, { setSubmitting }) => {
             try {
+                const fd = new FormData()
 
-                console.log(values);
+                fd.append('CustomerId', params?.id)
+                fd.append('Title', formik.values.adressTitle)
+                fd.append('Address', formik.values.openAddress)
+                fd.append("CityId", formik.values.city)
+                fd.append("StateId", formik.values.state)
+                fd.append("Id", selectedAdress?.id)
+
+                await UpdateCustomerAdress(fd).then((res) => {
+                    if (res.errors || res.statusCode === 400) {
+                        openSnackbar({
+                            open: true,
+                            message: `${res.message ? res.message : 'Error'}`,
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    } else {
+                        openSnackbar({
+                            open: true,
+                            message: 'Adres başarıyla güncellendi!',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            close: false
+                        })
+                        setIsEdit(true)
+                        closeModal()
+                    }
+                })
             } catch (error) {
                 console.log("error => ", error);
             }
@@ -86,7 +121,7 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId, se
                 id: 0,
                 name: "İlçe Seçiniz"
             }])
-            await getState(formik.values.city).then((res) => {
+            await getState(value?.id).then((res) => {
                 setStates((prevValue) => [...prevValue, ...res?.data])
             })
         }
@@ -129,7 +164,7 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId, se
                                             onChange={(e, value) => { setFieldValue('city', value.id); setFieldValue('state', 0); handleChangeState(value) }}
                                             value={cities.find((item) => item?.id === formik.values.city)}
                                             getOptionLabel={(option) => option.name}
-                                            renderInput={(params) => <TextField {...params} label="İl" />}
+                                            renderInput={(params) => <TextField error={Boolean(touched.city && errors.city)} helperText={touched.city && errors.city} {...params} label="İl" />}
                                         />
                                     </Grid>
 
@@ -150,7 +185,7 @@ export default function AdressUpdateForm({ closeModal, setIsEdit, customerId, se
                                                     return undefined
                                                 }
                                             })}
-                                            renderInput={(params) => <TextField {...params} label="İlçe" />}
+                                            renderInput={(params) => <TextField error={Boolean(touched.state && errors.state)} helperText={touched.state && errors.state} {...params} label="İlçe" />}
                                         />
                                     </Grid>
 

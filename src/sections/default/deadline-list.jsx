@@ -151,7 +151,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
 }
 // ==============================|| CUSTOMER LIST ||============================== //
 
-export default function DeadlineList() {
+export default function DeadlineList({ data, setData }) {
     const theme = useTheme();
     const navigate = useNavigate()
 
@@ -170,27 +170,27 @@ export default function DeadlineList() {
         pageSize: 10
     });
 
-    const [data, setData] = useState(() => []);
+
 
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        setLoading(true)
-        GetListDeadline().then((res) => { setData(res); setLoading(false); })
-    }, [pagination.pageIndex, pagination.pageSize, sorting]);
+    // useEffect(() => {
+    //     setLoading(true)
+    //     GetListDeadline().then((res) => { setData(res); setLoading(false); })
+    // }, [pagination.pageIndex, pagination.pageSize, sorting]);
 
     useEffect(() => {
         setPagination({ ...pagination, pageIndex: 0 })
     }, [globalFilter])
 
-    useEffect(() => {
-        if (isEdit) {
-            setIsEdit(false)
-            setLoading(true)
-            GetListDeadline().then((res) => { setData(res); setLoading(false); })
+    // useEffect(() => {
+    //     if (isEdit) {
+    //         setIsEdit(false)
+    //         setLoading(true)
+    //         GetListDeadline().then((res) => { setData(res); setLoading(false); })
 
-        }
-    }, [isEdit])
+    //     }
+    // }, [isEdit])
 
     const handleClose = () => {
         setOrderModalDelete(!orderModalDelete);
@@ -306,7 +306,7 @@ export default function DeadlineList() {
     );
     // let breadcrumbLinks = [{ title: 'Stok Yönetimi' }, { title: 'Stok Listesi', to: `/stock/list` }];
 
-    if (loading) return (<Loader open={loading} />)
+    // if (loading) return (<Loader open={loading} />)
 
     return (
         <>

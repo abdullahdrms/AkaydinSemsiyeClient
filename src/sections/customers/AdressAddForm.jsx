@@ -139,10 +139,11 @@ export default function AdressAddForm({ closeModal, setIsEdit, customerId }) {
                                             fullWidth
                                             disablePortal
                                             id="city"
+                                            disableClearable
                                             onChange={(e, value) => { setFieldValue('city', value.id) }}
                                             options={cities.map((item) => { return item })}
                                             getOptionLabel={(option) => option.name}
-                                            renderInput={(params) => <TextField {...params} label="İl" />}
+                                            renderInput={(params) => <TextField error={Boolean(touched.city && errors.city)} helperText={touched.city && errors.city} {...params} label="İl" />}
                                         />
                                     </Grid>
 
@@ -153,10 +154,11 @@ export default function AdressAddForm({ closeModal, setIsEdit, customerId }) {
                                             disablePortal
                                             id="state"
                                             disabled={loading2}
+                                            disableClearable
                                             onChange={(e, value) => { setFieldValue('state', value.id) }}
                                             options={states.map((item) => { return item })}
                                             getOptionLabel={(option) => option.name}
-                                            renderInput={(params) => <TextField {...params} label="İlçe" />}
+                                            renderInput={(params) => <TextField error={Boolean(touched.state && errors.state)} helperText={touched.state && errors.state} {...params} label="İlçe" />}
                                         />
                                     </Grid>
 

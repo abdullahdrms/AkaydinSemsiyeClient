@@ -1,12 +1,13 @@
-import { Box, Divider, Grid, Link, Typography } from '@mui/material'
+import { Box, Button, Divider, Grid, Link, Typography } from '@mui/material'
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 import Loader from 'components/Loader';
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import CustomerDetailOrderList from 'sections/customers/CustomerDetailOrderList'
 import { GetCustomerDetail } from 'services/customersServices';
 
 export default function CustomersDetail() {
+    const navigate = useNavigate()
     const params = useParams()
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState({})
@@ -24,6 +25,10 @@ export default function CustomersDetail() {
     return (
         <>
             <Breadcrumbs custom links={breadcrumbLinks} />
+            <Grid marginBottom={5} gap={1.6} display={'flex'} justifyContent={'end'} item xs={12}>
+                <Button onClick={() => navigate(`/customers/addresses/${params?.id}`)} color='primary' variant="contained">Adresler</Button>
+                <Button onClick={() => navigate(`/customers/${data?.customerType === 2 ? 'business/' : ''}update/${params.id}`)} color='warning' variant="contained">Düzenle</Button>
+            </Grid>
             <Grid container marginBottom={5} spacing={4.5}>
                 {
                     data?.customerType === 2 &&

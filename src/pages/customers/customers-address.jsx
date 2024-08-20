@@ -259,10 +259,9 @@ export default function CustomersAddress() {
             },
             {
                 header: 'Adres Durumu',
-                accessorKey: 'attributes.publishedAt',
                 cell: (cell) => {
-                    if (cell.getValue()) return <Chip color="success" label="Aktif" size="small" variant="light" />;
-                    else return <Chip color="error" label="Pasif" size="small" variant="light" />;
+                     return <Chip color="success" label="Aktif" size="small" variant="light" />;
+                   
                 }
             },
 
@@ -339,7 +338,7 @@ export default function CustomersAddress() {
             />
             <OrderModalDelete setIsDeleted={setIsDeleted} setLoading={setLoading} id={Number(customerDeleteId)} title={customerDeleteId} open={orderModalDelete} handleClose={handleClose} />
             <AdressAddModal setIsEdit={setIsEdit} open={adressAddModal} modalToggler={setAdressAddModal} />
-            <AdressUpdateModal selectedAdress={selectedAdress} open={adressUpdateModal} modalToggler={setAdressUpdateModal} />
+            <AdressUpdateModal setIsEdit={setIsEdit} selectedAdress={selectedAdress} open={adressUpdateModal} modalToggler={setAdressUpdateModal} />
         </>
     );
 }

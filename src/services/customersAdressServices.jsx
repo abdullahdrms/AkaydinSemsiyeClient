@@ -11,4 +11,8 @@ const AddCustomerAdress = (fd) => {
     return post(`/CustomerAddresses/Create`, fd, true, true);
 }
 
-export { GetCustomerAdress, AddCustomerAdress }
+const UpdateCustomerAdress = (fd) => {
+    return post(`/CustomerAddresses/Update`, fd, true, true);
+}
+
+export { GetCustomerAdress, AddCustomerAdress, UpdateCustomerAdress }
