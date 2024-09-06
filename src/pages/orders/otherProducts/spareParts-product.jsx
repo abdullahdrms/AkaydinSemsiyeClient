@@ -19,6 +19,7 @@ import MainCard from 'components/MainCard';
 import { CreateSparePartsService, GetOrderDetail, UpdateSparePartsService } from 'services/ordersServices';
 import { openSnackbar } from 'api/snackbar';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
+import ErrorModal from 'sections/facilities/ErrorModal';
 
 // CONSTANT
 const getInitialValues = ({ update, data }) => {
@@ -53,6 +54,8 @@ export default function SparePartsProduct({ update = false }) {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate()
     const [data, setData] = useState([])
+
+    const [errorModal, setErrorModal] = useState(false)
 
     const orderId = location.pathname.replace('/orders/detail/create-product/', '').split('/')[0]
     const updateOrderId = location.pathname.replace('/orders/detail/update-product/', '').split('/')[0]
@@ -210,6 +213,7 @@ export default function SparePartsProduct({ update = false }) {
 
     return (
         <>
+            <ErrorModal errors={formik.errors} open={errorModal} modalToggler={setErrorModal} />
             {
                 update &&
                 <Breadcrumbs custom links={breadcrumbLinks} />
@@ -375,7 +379,7 @@ export default function SparePartsProduct({ update = false }) {
                             <Grid container justifyContent="end" alignItems="end">
                                 <Grid item>
                                     <Stack direction="row" spacing={2} alignItems="end">
-                                        <Button type="submit" variant="contained" disabled={isSubmitting}>
+                                        <Button onClick={() => { Object.keys(formik.errors).length !== 0 && setErrorModal(true) }} type="submit" variant="contained" disabled={isSubmitting}>
                                             KAYDET
                                         </Button>
                                     </Stack>

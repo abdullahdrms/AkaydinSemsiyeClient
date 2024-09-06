@@ -23,6 +23,7 @@ import { openSnackbar } from 'api/snackbar';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 import StockControlModal from 'sections/facilities/StockControlModal';
 import { getListStockControl, restoreStock } from 'services/stockServices';
+import ErrorModal from 'sections/facilities/ErrorModal';
 
 // CONSTANT
 const getInitialValues = ({ update, data }) => {
@@ -119,6 +120,8 @@ export default function SidePoloProduct({ update = false }) {
     const [stockModal, setStockModal] = useState(false)
     const [stockData, setStockData] = useState([])
     const [formDt, setFormDt] = useState('')
+
+    const [errorModal, setErrorModal] = useState(false)
 
     const orderId = location.pathname.replace('/orders/detail/create-product/', '').split('/')[0]
     const updateOrderId = location.pathname.replace('/orders/detail/update-product/', '').split('/')[0]
@@ -608,6 +611,7 @@ export default function SidePoloProduct({ update = false }) {
 
     return (
         <>
+            <ErrorModal errors={formik.errors} open={errorModal} modalToggler={setErrorModal} />
             <StockControlModal qty={prevStockData} productId={5} update={update} stockData={stockData} formDt={formDt} open={stockModal} modalToggler={setStockModal} />
             {
                 update &&
@@ -2000,7 +2004,7 @@ export default function SidePoloProduct({ update = false }) {
                             <Grid container justifyContent="end" alignItems="end">
                                 <Grid item>
                                     <Stack direction="row" spacing={2} alignItems="end">
-                                        <Button type="submit" variant="contained" disabled={isSubmitting}>
+                                        <Button onClick={() => { Object.keys(formik.errors).length !== 0 && setErrorModal(true) }} type="submit" variant="contained" disabled={isSubmitting}>
                                             KAYDET
                                         </Button>
                                     </Stack>
