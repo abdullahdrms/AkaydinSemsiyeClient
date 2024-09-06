@@ -258,7 +258,6 @@ export default function StockList() {
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         // setSelectedStock()
-                                        console.log(row);
                                         setSelectedStock(row?.original)
                                         setStockModal(true)
                                     }}

@@ -274,7 +274,7 @@ export default function OrderList() {
                         case 4:
                             return <Chip color="success" label="Teslime Hazır" size="small" variant="light" />;
                         case 5:
-                            return <Chip color="success" label="Teslime Edildi" size="small" variant="light" />;
+                            return <Chip color="success" label="Teslim Edildi" size="small" variant="light" />;
                         case 6:
                             return <Chip color="error" label="İptal Edildi" size="small" variant="light" />;
                         case 10:

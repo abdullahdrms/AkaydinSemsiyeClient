@@ -164,7 +164,7 @@ export default function ProductDetail() {
                                     </Typography>
                                 </Typography>
                                 {
-                                    data?.diameter === 0 &&
+                                    data?.shape !== 3 &&
                                     <>
                                         <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
                                         <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
@@ -187,7 +187,7 @@ export default function ProductDetail() {
                                     </>
                                 }
                                 {
-                                    data?.diameter > 0 &&
+                                    data?.shape === 3 &&
                                     <>
                                         <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
                                         <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
@@ -268,10 +268,10 @@ export default function ProductDetail() {
                                         {data?.fabric === 1 ? "Akrilik" : data?.fabric === 2 ? "Lokal" : data?.fabric === 3 ? "Özel" : data?.fabric === 4 ? "Makrome" : ""}
                                     </Typography>
                                 </Typography>
-                                <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
                                 {
-                                    data?.fabric !== 3 &&
+                                    (data?.fabric !== 3 && data?.fabric !== 4) &&
                                     <>
+                                        <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
                                         <Typography sx={{ marginTop: 2.5, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
                                             <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
                                                 Kumaş Renk Kodu
@@ -287,14 +287,17 @@ export default function ProductDetail() {
                                 }
                                 {
                                     data?.fabric === 3 &&
-                                    <Typography sx={{ marginTop: 2.5, display: 'block', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
-                                        <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
-                                            Kumaş Notları {"=>"} {"  "}
+                                    <>
+                                    <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
+                                        <Typography sx={{ marginTop: 2.5, display: 'block', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
+                                            <Typography color='#7e8299' variant="subtitle1" fontSize={15} component="span">
+                                                Kumaş Notları {"=>"} {"  "}
+                                            </Typography>
+                                            <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
+                                                {data?.fabricText}
+                                            </Typography>
                                         </Typography>
-                                        <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
-                                            {data?.fabricText}
-                                        </Typography>
-                                    </Typography>
+                                    </>
                                 }
                             </Box>
                         </Grid>
@@ -329,7 +332,7 @@ export default function ProductDetail() {
                                     </>
                                 }
                                 {
-                                    data?.marbleStatus === 2 &&
+                                    (data?.marbleStatus === 2 && data?.standType === 2) &&
                                     <>
                                         <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
                                         <Typography sx={{ marginTop: 2, display: 'flex', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">
@@ -563,7 +566,7 @@ export default function ProductDetail() {
                                         Perde
                                     </Typography>
                                     <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
-                                        {data?.curtain === 1 ? "Yok" : data?.led === 2 ? "Var" : ""}
+                                        {data?.curtain === 1 ? "Yok" : data?.curtain === 2 ? "Var" : ""}
                                     </Typography>
                                 </Typography>
                                 {
@@ -655,7 +658,7 @@ export default function ProductDetail() {
                                     </>
                                 }
                                 {
-                                    (data?.heater === 2 && data?.heaterText === 3) &&
+                                    (data?.heater === 2 && data?.heaterText !== null) &&
                                     <>
                                         <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />
                                         <Typography sx={{ marginTop: 2.5, display: 'block', justifyContent: 'space-between' }} color='#7e8299' variant="subtitle1" component="span">

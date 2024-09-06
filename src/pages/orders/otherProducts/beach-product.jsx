@@ -20,6 +20,8 @@ import { getFabricCharts } from 'services/fabricChartsServices';
 import { CreateBeachUmbrella, GetOrderDetail, UpdateBeachUmbrella } from 'services/ordersServices';
 import { openSnackbar } from 'api/snackbar';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
+import StockControlModal from 'sections/facilities/StockControlModal';
+import { getListStockControl, restoreStock } from 'services/stockServices';
 
 // CONSTANT
 const getInitialValues = ({ update, data }) => {
@@ -49,6 +51,7 @@ const getInitialValues = ({ update, data }) => {
         biasText: `${data?.biasText === null ? "" : data?.biasText}`,
         localColor: `${data?.fabricChart?.colorType === 2 ? data?.fabricChart?.code : 0}` || "",
         orderDetailStatus: `${data?.orderDetailStatus}` || 0,
+        fabricChartId: `${data?.fabricChart?.id}` || 0,
     };
     if (update) {
         return orderUpdate
@@ -66,15 +69,25 @@ export default function BeachProduct({ update = false }) {
 
     const [localColors, setLocalColors] = useState([])
 
+    const [stockModal, setStockModal] = useState(false)
+    const [stockData, setStockData] = useState([])
+    const [formDt, setFormDt] = useState('')
+
     const orderId = location.pathname.replace('/orders/detail/create-product/', '').split('/')[0]
     const updateOrderId = location.pathname.replace('/orders/detail/update-product/', '').split('/')[0]
 
+    const [prevStockData, setPrevStockData] = useState({})
+
     useEffect(() => {
-        // console.log('orderId:', orderId, 'productId:', params.id);
         const fetchData = async () => {
             if (update) {
                 await GetOrderDetail(updateOrderId).then((res) => {
                     setData(res?.data)
+                    setPrevStockData({
+                        stockStandQty: res?.data?.stockStandQty,
+                        stockFabricQty: res?.data?.stockFabricQty,
+                        stockSkeletonQty: res?.data?.stockSkeletonQty
+                    })
                 })
             }
             await getFabricCharts().then((res) => {
@@ -160,6 +173,45 @@ export default function BeachProduct({ update = false }) {
                         }
                         setSubmitting(false)
                     })
+                    // await getListStockControl(fd).then(async (res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         if (res?.data?.length !== 0) {
+                    //             setFormDt(fd)
+                    //             setStockData(res?.data)
+                    //             setStockModal(true)
+                    //         } else {
+                    //             const updateFd = new FormData()
+                    //             updateFd.append('OrderDetailId', updateOrderId)
+                    //             await restoreStock(updateFd)
+                    //             await UpdateBeachUmbrella(fd).then((res) => {
+                    //                 if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //                     openSnackbar({
+                    //                         open: true,
+                    //                         message: `${res?.message ? res?.message : 'Error'}`,
+                    //                         variant: 'alert',
+                    //                         alert: {
+                    //                             color: 'error'
+                    //                         },
+                    //                         close: false
+                    //                     })
+                    //                 } else {
+                    //                     navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                    //                 }
+                    //             })
+                    //         }
+                    //     }
+                    //     setSubmitting(false)
+                    // })
                 } else {
                     await CreateBeachUmbrella(fd).then((res) => {
                         if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
@@ -177,6 +229,43 @@ export default function BeachProduct({ update = false }) {
                         }
                         setSubmitting(false)
                     })
+                    // await getListStockControl(fd).then(async (res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         if (res?.data?.length !== 0) {
+                    //             setFormDt(fd)
+                    //             setStockData(res?.data)
+                    //             setStockModal(true)
+                    //         } else {
+                    //             await CreateBeachUmbrella(fd).then((res) => {
+                    //                 if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //                     openSnackbar({
+                    //                         open: true,
+                    //                         message: `${res?.message ? res?.message : 'Error'}`,
+                    //                         variant: 'alert',
+                    //                         alert: {
+                    //                             color: 'error'
+                    //                         },
+                    //                         close: false
+                    //                     })
+                    //                 } else {
+                    //                     navigate(`/orders/detail/${orderId}`)
+                    //                 }
+                    //             })
+                    //         }
+
+                    //     }
+                    //     setSubmitting(false)
+                    // })
                 }
 
             } catch (error) {
@@ -219,6 +308,7 @@ export default function BeachProduct({ update = false }) {
 
     return (
         <>
+            {/* <StockControlModal qty={prevStockData} productId={8} update={update} stockData={stockData} formDt={formDt} open={stockModal} modalToggler={setStockModal} /> */}
             {
                 update &&
                 <Breadcrumbs custom links={breadcrumbLinks} />
@@ -307,9 +397,9 @@ export default function BeachProduct({ update = false }) {
                                                                             disableClearable
                                                                             id="basic-autocomplete-label"
                                                                             options={localColors}
-                                                                            getOptionLabel={(option) => `${option.name}`}
+                                                                            getOptionLabel={(option) => `${option.name}` || ''}
                                                                             onChange={(e, value) => { setFieldValue('localColor', value.code); setFieldValue('fabricChartId', value.id) }}
-                                                                            value={localColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.localColor))}
+                                                                            value={localColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.localColor)) || null}
                                                                             renderInput={(params) => <TextField error={Boolean(errors.localColor)} helperText={errors.localColor} {...params} label="Lütfen Yerli Renk Seçiniz" />}
                                                                         />
                                                                     </Grid>

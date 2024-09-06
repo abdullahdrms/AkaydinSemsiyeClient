@@ -38,6 +38,17 @@ const updateSemiFinished = (fd) => {
     return post(`/SemiFinished/Update`, fd, true, true);
 }
 
+const getListStockControl = (fd) => {
+    return post(`/SemiFinished/GetListStockControl`, fd, true, true);
+}
+
+const restoreStock = (fd) => {
+    return post(`/SemiFinished/RestoreStock`, fd, true, true);
+}
+
+const getSemiFinishedDetail = (id) => {
+    return get(`/SemiFinished/GetDetail?id=${id}`, true);
+}
 
 
-export { getStocks, createStock, updateStock, getMaterials, getSemiFinished, createMaterials, updateMaterial, createSemiFinished, updateSemiFinished }
+export { getStocks, createStock, updateStock, getMaterials, getSemiFinished, createMaterials, updateMaterial, createSemiFinished, updateSemiFinished, getListStockControl, restoreStock, getSemiFinishedDetail }

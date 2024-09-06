@@ -117,12 +117,13 @@ export default function Default() {
 
       <Grid item xs={12} display={'flex'} gap={3}>
         <Grid item xs={12} lg={6}>
-          <TotalIncome bestProductYearCount={bestProductYearCount} />
+          {/* <TotalIncome bestProductYearCount={bestProductYearCount} /> */}
+          <ProductOverview bestProductMonthCount={bestProductYearCount} label='En çok satılan ürün' />
         </Grid>
       </Grid>
 
       <Grid item marginBottom={6} marginTop={6} xs={12} lg={12}>
-        <ProductOverview bestProductMonthCount={bestProductMonthCount} />
+        <ProductOverview label='Aylık en çok satılan ürün' bestProductMonthCount={bestProductMonthCount} />
       </Grid>
     </>
   );

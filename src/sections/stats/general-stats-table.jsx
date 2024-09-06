@@ -9,10 +9,26 @@ export default function GeneralStatsTable() {
     const [firstYear, setFirstYear] = useState(new Date().getFullYear() - 2)
     const [lastYear, setLastYear] = useState(new Date().getFullYear())
     const [loading, setLoading] = useState(true)
+    const [total, setTotal] = useState([])
 
     useEffect(() => {
         setData([])
+        setTotal([])
+        for (let index = firstYear; index <= lastYear; index++) {
+            setTotal((prevValues) => [...prevValues, { year: parseInt(index), price: 0 }])
+        }
         getGeneralStats({ firstYear: firstYear, lastYear: lastYear }).then((res) => {
+            res?.data?.map((item) => {
+                item?.years?.map((year) => {
+                    setTotal((prevTotal) =>
+                        prevTotal.map((totalItem) =>
+                            totalItem.year === year.year
+                                ? { ...totalItem, price: year.price + totalItem.price }
+                                : totalItem
+                        )
+                    );
+                })
+            })
             setData(res?.data)
             setLoading(false)
         })
@@ -247,6 +263,19 @@ export default function GeneralStatsTable() {
                                         )
                                     })
                                 }
+                                <TableRow>
+                                    <TableCell style={{ fontWeight: 'bold' }}>GENEL TOPLAM</TableCell>
+                                    {
+                                        total?.map((item, i) => {
+                                            return (
+                                                <React.Fragment key={i}>
+                                                    <TableCell style={{ textAlign: 'center', fontWeight: 'bold' }}>{item?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                                    <TableCell style={{ textAlign: 'center', fontWeight: 'bold' }}>-</TableCell>
+                                                </React.Fragment>
+                                            )
+                                        })
+                                    }
+                                </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>

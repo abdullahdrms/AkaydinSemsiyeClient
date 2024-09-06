@@ -231,10 +231,10 @@ export default function SparePartsProduct({ update = false }) {
                                                     fullWidth
                                                     id="basic-autocomplete-label"
                                                     options={statusTypes}
-                                                    getOptionLabel={(option) => `${option?.name}`}
+                                                    getOptionLabel={(option) => `${option?.name}` || ''}
                                                     isOptionEqualToValue={(option, value) => option?.id === value?.id}
                                                     onChange={(e, value) => { setFieldValue('orderDetailStatus', value?.id) }}
-                                                    value={statusTypes.find((item) => parseInt(item?.id) === parseInt(formik.values.orderDetailStatus))}
+                                                    value={statusTypes.find((item) => parseInt(item?.id) === parseInt(formik.values.orderDetailStatus)) || null}
                                                     renderInput={(params) => <TextField {...params} helperText={errors.orderDetailStatus} error={Boolean(errors.orderDetailStatus)} label="Lütfen Sipariş Durumu Seçiniz" />}
                                                 />
                                             </Grid>
@@ -249,10 +249,11 @@ export default function SparePartsProduct({ update = false }) {
                                                 fullWidth
                                                 id="process"
                                                 disableClearable
-                                                isOptionEqualToValue={(option, value) => option.value === value.value}
-                                                onChange={(e, value) => setFieldValue('process', value?.value)}
                                                 options={processList}
-                                                getOptionLabel={(option) => `${option?.text ? option?.text : ''}`}
+                                                isOptionEqualToValue={(option, value) => option?.value === value?.value}
+                                                onChange={(e, value) => setFieldValue('process', parseInt(value?.value))}
+                                                getOptionLabel={(option) => `${option?.text ? option?.text : ''}` || ''}
+                                                value={processList.find((item) => parseInt(item?.value) === parseInt(formik.values.process)) || null}
                                                 renderInput={(params) => <TextField helperText={errors.process} error={Boolean(errors.process)} {...params} label="Lütfen İşlem Seçiniz" />}
                                             />
                                         </Grid>

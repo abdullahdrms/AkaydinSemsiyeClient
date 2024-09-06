@@ -20,6 +20,8 @@ import { getFabricCharts } from 'services/fabricChartsServices';
 import { CreateWoodenUmbrella, GetOrderDetail, UpdateWoodenUmbrella } from 'services/ordersServices';
 import { openSnackbar } from 'api/snackbar';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
+import StockControlModal from 'sections/facilities/StockControlModal';
+import { getListStockControl, restoreStock } from 'services/stockServices';
 
 // CONSTANT
 const getInitialValues = ({ data, update }) => {
@@ -31,6 +33,7 @@ const getInitialValues = ({ data, update }) => {
         taxType: "",
         price: 0,
         shapeSizeType: "",
+        flansType: "",
         fabric: "",
         fabricText: "",
         standType: "",
@@ -61,6 +64,7 @@ const getInitialValues = ({ data, update }) => {
         qty: `${data?.qty}` || "",
         taxType: `${data?.tax === 0 ? "3" : data?.tax === 20 ? "4" : data?.tax === 10 ? "5" : ""}` || "",
         price: `${data?.price}` || "",
+        flansType: `${data?.flansType}` || "",
         shapeSizeType: `${data?.width === 200 && data?.height === 200 ? "1" : data?.width === 250 && data?.height === 250 ? "2" : data?.width === 300 && data?.height === 300 ? "3" : data?.width === 350 && data?.height === 350 ? "4" : data?.width === 400 && data?.height === 400 ? "5" : data?.width === 450 && data?.height === 450 ? "6" : data?.width === 500 && data?.height === 500 ? "7" : data?.width === 550 && data?.height === 550 ? "8" : data?.width === 600 && data?.height === 600 ? "9" : data?.width === 300 && data?.height === 400 ? "10" : data?.width === 400 && data?.height === 500 ? "11" : data?.width === 500 && data?.height === 600 ? "12" : data?.width === 400 && data?.height === 600 ? "13" : data?.diameter === 250 ? "14" : ""}` || "",
         fabric: `${data?.fabric}` || "",
         fabricText: `${data?.fabricText === null ? "" : data?.fabricText}` || "",
@@ -102,16 +106,26 @@ export default function WoodenProduct({ update = false }) {
     const [localColors, setLocalColors] = useState([])
     const [acrylicColors, setAcrylicColors] = useState([])
 
+    const [stockModal, setStockModal] = useState(false)
+    const [stockData, setStockData] = useState([])
+    const [formDt, setFormDt] = useState('')
+
     const orderId = location.pathname.replace('/orders/detail/create-product/', '').split('/')[0]
     const updateOrderId = location.pathname.replace('/orders/detail/update-product/', '').split('/')[0]
+
+    const [prevStockData, setPrevStockData] = useState({})
 
     useEffect(() => {
         // console.log('orderId:', orderId, 'productId:', params.id);
         const fetchData = async () => {
             if (update) {
                 await GetOrderDetail(updateOrderId).then((res) => {
-                    console.log(res);
                     setData(res?.data)
+                    setPrevStockData({
+                        stockStandQty: res?.data?.stockStandQty,
+                        stockFabricQty: res?.data?.stockFabricQty,
+                        stockSkeletonQty: res?.data?.stockSkeletonQty
+                    })
                 })
             }
             await getFabricCharts().then((res) => {
@@ -144,13 +158,7 @@ export default function WoodenProduct({ update = false }) {
             }
         }),
         marbleType: Yup.string().test("isValid", "Bu alan zorunlu", (value) => {
-            if (parseInt(formik.values.standType) === 3) {
-                if (parseInt(value) === 1) {
-                    return true
-                } else {
-                    return false
-                }
-            } else if (parseInt(formik.values.standType) === 2) {
+            if (parseInt(formik.values.standType) === 2) {
                 if (parseInt(formik.values.marbleStatus) === 2) {
                     if (parseInt(value) > 0) {
                         return true
@@ -177,6 +185,17 @@ export default function WoodenProduct({ update = false }) {
             }
         }),
         fabric: Yup.string().required('bu alan zorunlu'),
+        flansType: Yup.string().test("isValid", "Bu alan zorunlu", (value) => {
+            if (parseInt(formik.values.standType) === 3) {
+                if (parseInt(value) > 0) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return true
+            }
+        }),
         acrylicColor: Yup.number().test("isValid", "Bu alan zorunlu", (value) => {
             if (parseInt(formik.values.fabric) === 1) {
                 if (value > 0) {
@@ -376,6 +395,9 @@ export default function WoodenProduct({ update = false }) {
                 if (parseInt(formik.values.standType) === 2) {
                     fd.append("MarbleStatus", formik.values.marbleStatus)
                 }
+                if (parseInt(formik.values.standType) === 3) {
+                    fd.append("FlansType", formik.values.flansType)
+                }
                 if (parseInt(formik.values.marbleStatus) === 2) {
                     fd.append("MarbleType", formik.values.marbleType)
                 }
@@ -416,6 +438,45 @@ export default function WoodenProduct({ update = false }) {
                         }
                         setSubmitting(false)
                     })
+                    // await getListStockControl(fd).then(async (res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         if (res?.data?.length !== 0) {
+                    //             setFormDt(fd)
+                    //             setStockData(res?.data)
+                    //             setStockModal(true)
+                    //         } else {
+                    //             const updateFd = new FormData()
+                    //             updateFd.append('OrderDetailId', updateOrderId)
+                    //             await restoreStock(updateFd)
+                    //             await UpdateWoodenUmbrella(fd).then((res) => {
+                    //                 if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //                     openSnackbar({
+                    //                         open: true,
+                    //                         message: `${res?.message ? res?.message : 'Error'}`,
+                    //                         variant: 'alert',
+                    //                         alert: {
+                    //                             color: 'error'
+                    //                         },
+                    //                         close: false
+                    //                     })
+                    //                 } else {
+                    //                     navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                    //                 }
+                    //             })
+                    //         }
+                    //     }
+                    //     setSubmitting(false)
+                    // })
                 } else {
                     await CreateWoodenUmbrella(fd).then((res) => {
                         if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
@@ -433,6 +494,43 @@ export default function WoodenProduct({ update = false }) {
                         }
                         setSubmitting(false)
                     })
+                    // await getListStockControl(fd).then(async (res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         if (res?.data?.length !== 0) {
+                    //             setFormDt(fd)
+                    //             setStockData(res?.data)
+                    //             setStockModal(true)
+                    //         } else {
+                    //             await CreateWoodenUmbrella(fd).then((res) => {
+                    //                 if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //                     openSnackbar({
+                    //                         open: true,
+                    //                         message: `${res?.message ? res?.message : 'Error'}`,
+                    //                         variant: 'alert',
+                    //                         alert: {
+                    //                             color: 'error'
+                    //                         },
+                    //                         close: false
+                    //                     })
+                    //                 } else {
+                    //                     navigate(`/orders/detail/${orderId}`)
+                    //                 }
+                    //             })
+                    //         }
+
+                    //     }
+                    //     setSubmitting(false)
+                    // })
                 }
 
             } catch (error) {
@@ -475,6 +573,7 @@ export default function WoodenProduct({ update = false }) {
 
     return (
         <>
+            {/* <StockControlModal qty={prevStockData} productId={7} update={update} stockData={stockData} formDt={formDt} open={stockModal} modalToggler={setStockModal} /> */}
             {
                 update &&
                 <Breadcrumbs custom links={breadcrumbLinks} />
@@ -690,9 +789,9 @@ export default function WoodenProduct({ update = false }) {
                                                                             disableClearable
                                                                             id="basic-autocomplete-label"
                                                                             options={acrylicColors}
-                                                                            getOptionLabel={(option) => `${option.name}`}
+                                                                            getOptionLabel={(option) => `${option.name}` || ''}
                                                                             onChange={(e, value) => { setFieldValue('acrylicColor', value?.code); setFieldValue('fabricChartId', value?.id) }}
-                                                                            value={acrylicColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.acrylicColor))}
+                                                                            value={acrylicColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.acrylicColor)) || null}
                                                                             renderInput={(params) => <TextField error={Boolean(errors.acrylicColor)} helperText={errors.acrylicColor} {...params} label="Lütfen Akrilik Renk Seçiniz" />}
                                                                         />
                                                                     </Grid>
@@ -715,9 +814,9 @@ export default function WoodenProduct({ update = false }) {
                                                                             disableClearable
                                                                             id="basic-autocomplete-label"
                                                                             options={localColors}
-                                                                            getOptionLabel={(option) => `${option.name}`}
+                                                                            getOptionLabel={(option) => `${option.name}` || ''}
                                                                             onChange={(e, value) => { setFieldValue('localColor', value?.code); setFieldValue('fabricChartId', value?.id) }}
-                                                                            value={localColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.localColor))}
+                                                                            value={localColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.localColor)) || null}
                                                                             renderInput={(params) => <TextField error={Boolean(errors.localColor)} helperText={errors.localColor} {...params} label="Lütfen Yerli Renk Seçiniz" />}
                                                                         />
                                                                     </Grid>
@@ -968,13 +1067,13 @@ export default function WoodenProduct({ update = false }) {
                                                 <Grid marginBottom={3} item xs={12}>
                                                     <InputLabel style={{ marginBottom: '20px', marginTop: '16px' }}>Flanş Türü</InputLabel>
                                                     <FormControl style={{ width: '100%' }} component="fieldset">
-                                                        <RadioGroup id='marbleType' name="radio-marbleType" row>
+                                                        <RadioGroup id='flansType' name="radio-flansType" row>
                                                             <Grid container spacing={3}>
                                                                 <Grid item lg={3} xs={12}>
-                                                                    <Box onClick={() => setFieldValue('marbleType', "1")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                    <Box onClick={() => setFieldValue('flansType', "1")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.flansType ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
                                                                         <label>
                                                                             <span>
-                                                                                <input style={{ width: '20px', height: '20px' }} value="1" checked={formik.values.marbleType === "1" ? true : false} onChange={(e) => setFieldValue('marbleType', "1")} name='radio-marbleType' type="radio" />
+                                                                                <input style={{ width: '20px', height: '20px' }} value="1" checked={formik.values.flansType === "1" ? true : false} onChange={(e) => setFieldValue('flansType', "1")} name='radio-flansType' type="radio" />
                                                                             </span>
                                                                             <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
                                                                                 25 x 25
@@ -986,7 +1085,7 @@ export default function WoodenProduct({ update = false }) {
                                                         </RadioGroup>
                                                     </FormControl>
                                                     {
-                                                        errors.marbleType &&
+                                                        errors.flansType &&
                                                         <p style={{ color: '#dc2626', fontWeight: 400, fontSize: '0.75rem', textAlign: 'left' }}>Bu alan zorunlu</p>
                                                     }
                                                 </Grid>

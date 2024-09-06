@@ -8,11 +8,19 @@ export default function YearlyStatsTable() {
     const [data, setData] = useState([])
     const [year, setYear] = useState(new Date().getFullYear())
     const [loading, setLoading] = useState(true)
+    const [totalQty, setTotalQty] = useState(0)
+    const [totalPrice, setTotalPrice] = useState(0)
 
     useEffect(() => {
         setData([])
+        setTotalQty(0)
+        setTotalPrice(0)
         getYearlyStats({ year }).then((res) => {
             setData(res?.data)
+            res?.data?.map((itm) => {
+                setTotalQty((prevValue) => prevValue + itm?.qty)
+                setTotalPrice((prevValue) => prevValue + itm?.price)
+            })
             setLoading(false)
         })
     }, [year])
@@ -180,7 +188,22 @@ export default function YearlyStatsTable() {
                                         );
                                     })
                                 }
-
+                                <TableRow sx={[
+                                    {
+                                        '&:hover': {
+                                            backgroundColor: 'inherit !important',
+                                        },
+                                    },
+                                ]}>
+                                    <TableCell rowSpan={2} style={{ textAlign: 'center' }}></TableCell>
+                                    <TableCell rowSpan={2} style={{ textAlign: 'center' }}></TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                                    <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>TOPLAM SİPARİŞ</TableCell>
+                                    <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>{totalQty}</TableCell>
+                                    <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>SİPARİŞ TOPLAMI</TableCell>
+                                    <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>{totalPrice.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                </TableRow>
                             </TableBody>
 
                         </Table>

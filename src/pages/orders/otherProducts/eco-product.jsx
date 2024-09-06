@@ -21,6 +21,8 @@ import { getSkeletonCharts } from 'services/skeletonChartsServices';
 import { CreateEcoUmbrella, GetOrderDetail, UpdateEcoUmbrella } from 'services/ordersServices';
 import { openSnackbar } from 'api/snackbar';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
+import StockControlModal from 'sections/facilities/StockControlModal';
+import { getListStockControl, restoreStock } from 'services/stockServices';
 
 // CONSTANT
 const getInitialValues = ({ data, update }) => {
@@ -126,16 +128,25 @@ export default function EcoProduct({ update = false }) {
     const [acrylicColors, setAcrylicColors] = useState([])
     const [skeletonCharts, setSkeletonCharts] = useState([])
 
+    const [stockModal, setStockModal] = useState(false)
+    const [stockData, setStockData] = useState([])
+    const [formDt, setFormDt] = useState('')
+
     const orderId = location.pathname.replace('/orders/detail/create-product/', '').split('/')[0]
     const updateOrderId = location.pathname.replace('/orders/detail/update-product/', '').split('/')[0]
 
+    const [prevStockData, setPrevStockData] = useState({})
+
     useEffect(() => {
-        // console.log('orderId:', orderId, 'productId:', params.id);
         const fetchData = async () => {
             if (update) {
                 await GetOrderDetail(updateOrderId).then((res) => {
-                    console.log(res);
                     setData(res?.data)
+                    setPrevStockData({
+                        stockStandQty: res?.data?.stockStandQty,
+                        stockFabricQty: res?.data?.stockFabricQty,
+                        stockSkeletonQty: res?.data?.stockSkeletonQty
+                    })
                 })
             }
             await getFabricCharts().then((res) => {
@@ -260,13 +271,7 @@ export default function EcoProduct({ update = false }) {
             }
         }),
         marbleType: Yup.string().test("isValid", "Bu alan zorunlu", (value) => {
-            if (parseInt(formik.values.standType) === 3) {
-                if (parseInt(value) === 1) {
-                    return true
-                } else {
-                    return false
-                }
-            } else if (parseInt(formik.values.standType) === 2) {
+            if (parseInt(formik.values.standType) === 2) {
                 if (parseInt(formik.values.marbleStatus) === 2) {
                     if (parseInt(value) > 0) {
                         return true
@@ -411,7 +416,6 @@ export default function EcoProduct({ update = false }) {
         onSubmit: async (values, { setSubmitting }) => {
             try {
                 setSubmitting(true)
-                console.log(values);
                 const fd = new FormData()
                 if (update) {
                     fd.append("Id", updateOrderId)
@@ -436,7 +440,6 @@ export default function EcoProduct({ update = false }) {
                 }
                 fd.append("Flue", formik.values.flue)
                 fd.append("SkeletonChartId", formik.values.skeletonChartId)
-                fd.append("SkeletonChartCode", 1032)
                 fd.append("Fabric", formik.values.fabric)
 
                 if (parseInt(formik.values.fabric) !== 3) {
@@ -495,7 +498,23 @@ export default function EcoProduct({ update = false }) {
                     fd.append("ElectricText", formik.values.electricText)
                 }
                 if (update) {
-                    await UpdateEcoUmbrella(fd).then((res) => {
+                    // await UpdateEcoUmbrella(fd).then((res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                    //     }
+                    //     setSubmitting(false)
+                    // })
+                    await getListStockControl(fd).then(async (res) => {
                         if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
                             openSnackbar({
                                 open: true,
@@ -507,12 +526,51 @@ export default function EcoProduct({ update = false }) {
                                 close: false
                             })
                         } else {
-                            navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                            if (res?.data?.length !== 0) {
+                                setFormDt(fd)
+                                setStockData(res?.data)
+                                setStockModal(true)
+                            } else {
+                                const updateFd = new FormData()
+                                updateFd.append('OrderDetailId', updateOrderId)
+                                await restoreStock(updateFd)
+                                await UpdateEcoUmbrella(fd).then((res) => {
+                                    if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                                        openSnackbar({
+                                            open: true,
+                                            message: `${res?.message ? res?.message : 'Error'}`,
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            close: false
+                                        })
+                                    } else {
+                                        navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                                    }
+                                })
+                            }
                         }
                         setSubmitting(false)
                     })
                 } else {
-                    await CreateEcoUmbrella(fd).then((res) => {
+                    // await CreateEcoUmbrella(fd).then((res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         navigate(`/orders/detail/${orderId}`)
+                    //     }
+                    //     setSubmitting(false)
+                    // })
+                    await getListStockControl(fd).then(async (res) => {
                         if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
                             openSnackbar({
                                 open: true,
@@ -524,7 +582,28 @@ export default function EcoProduct({ update = false }) {
                                 close: false
                             })
                         } else {
-                            navigate(`/orders/detail/${orderId}`)
+                            if (res?.data?.length !== 0) {
+                                setFormDt(fd)
+                                setStockData(res?.data)
+                                setStockModal(true)
+                            } else {
+                                await CreateEcoUmbrella(fd).then((res) => {
+                                    if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                                        openSnackbar({
+                                            open: true,
+                                            message: `${res?.message ? res?.message : 'Error'}`,
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            close: false
+                                        })
+                                    } else {
+                                        navigate(`/orders/detail/${orderId}`)
+                                    }
+                                })
+                            }
+
                         }
                         setSubmitting(false)
                     })
@@ -536,6 +615,7 @@ export default function EcoProduct({ update = false }) {
     });
 
     const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
+
 
     let breadcrumbLinks = [{ title: 'Sipariş Yönetimi', to: '/orders/list' }, { title: 'Detay', to: `/orders/detail/${data?.orderId}` }, { title: 'Ürün Detayı', to: `/orders/detail/product-detail/${updateOrderId}` }, { title: 'Ürün Düzenle' }, { title: 'Mekanizmalı Ekonomik Şemsiye', }]
 
@@ -569,6 +649,7 @@ export default function EcoProduct({ update = false }) {
 
     return (
         <>
+            <StockControlModal qty={prevStockData} productId={4} update={update} stockData={stockData} formDt={formDt} open={stockModal} modalToggler={setStockModal} />
             {
                 update &&
                 <Breadcrumbs custom links={breadcrumbLinks} />
@@ -864,9 +945,9 @@ export default function EcoProduct({ update = false }) {
                                                     disableClearable
                                                     id="basic-autocomplete-label"
                                                     options={skeletonCharts}
-                                                    getOptionLabel={(option) => `${option?.name}`}
+                                                    getOptionLabel={(option) => `${option?.name}` || ''}
                                                     onChange={(e, value) => { setFieldValue("skeletonChartId", value?.id); setFieldValue("skeletonChartCode", value?.code) }}
-                                                    value={skeletonCharts?.find((item) => item?.id === parseInt(formik.values.skeletonChartId))}
+                                                    value={skeletonCharts?.find((item) => item?.id === parseInt(formik.values.skeletonChartId)) || null}
                                                     renderInput={(params) => <TextField error={Boolean(errors.skeletonChartId)} helperText={errors.skeletonChartId} {...params} label="İskelet Renk Seçimi" />}
                                                 />
                                             </Grid>
@@ -949,9 +1030,9 @@ export default function EcoProduct({ update = false }) {
                                                                             disableClearable
                                                                             id="basic-autocomplete-label"
                                                                             options={acrylicColors}
-                                                                            getOptionLabel={(option) => `${option?.name}`}
+                                                                            getOptionLabel={(option) => `${option?.name}` || ''}
                                                                             onChange={(e, value) => { setFieldValue('acrylicColor', value?.code); setFieldValue('fabricChartId', value?.id) }}
-                                                                            value={acrylicColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.acrylicColor))}
+                                                                            value={acrylicColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.acrylicColor)) || null}
                                                                             renderInput={(params) => <TextField error={Boolean(errors.acrylicColor)} helperText={errors.acrylicColor} {...params} label="Lütfen Akrilik Renk Seçiniz" />}
                                                                         />
                                                                     </Grid>
@@ -971,13 +1052,13 @@ export default function EcoProduct({ update = false }) {
                                                                         </div>
                                                                         <Autocomplete
                                                                             fullWidth
-                                                                            disableClearable
                                                                             id="basic-autocomplete-label"
                                                                             options={localColors}
-                                                                            getOptionLabel={(option) => `${option?.name}`}
+                                                                            disableClearable
+                                                                            getOptionLabel={(option) => `${option?.name}` || ''}
                                                                             onChange={(e, value) => { setFieldValue('localColor', value?.code); setFieldValue('fabricChartId', value?.id) }}
-                                                                            value={localColors?.find((item) => parseInt(item?.id) === parseInt(formik.values.localColor))}
-                                                                            renderInput={(params) => <TextField {...params} label="Lütfen Yerli Renk Seçiniz" />}
+                                                                            value={localColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.localColor)) || null}
+                                                                            renderInput={(params) => <TextField error={Boolean(errors.localColor)} helperText={errors.localColor} {...params} label="Lütfen Yerli Renk Seçiniz" />}
                                                                         />
                                                                     </Grid>
                                                                     <Grid item xs={12} lg={4} >

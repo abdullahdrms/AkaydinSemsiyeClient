@@ -21,6 +21,8 @@ import { getFabricCharts } from 'services/fabricChartsServices';
 import { getSkeletonCharts } from 'services/skeletonChartsServices';
 import { openSnackbar } from 'api/snackbar';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
+import StockControlModal from 'sections/facilities/StockControlModal';
+import { getListStockControl, restoreStock } from 'services/stockServices';
 
 // CONSTANT
 const getInitialValues = ({ data, update }) => {
@@ -132,17 +134,26 @@ export default function LuxuryProduct({ update = false }) {
     const [acrylicColors, setAcrylicColors] = useState([])
     const [skeletonCharts, setSkeletonCharts] = useState([])
 
+    const [stockModal, setStockModal] = useState(false)
+    const [stockData, setStockData] = useState([])
+    const [formDt, setFormDt] = useState('')
+
 
     const orderId = location.pathname.replace('/orders/detail/create-product/', '').split('/')[0]
     const updateOrderId = location.pathname.replace('/orders/detail/update-product/', '').split('/')[0]
 
+    const [prevStockData, setPrevStockData] = useState({})
+
     useEffect(() => {
-        // console.log('orderId:', orderId, 'productId:', params.id);
         const fetchData = async () => {
             if (update) {
                 await GetOrderDetail(updateOrderId).then((res) => {
-                    console.log(res);
                     setData(res?.data)
+                    setPrevStockData({
+                        stockStandQty: res?.data?.stockStandQty,
+                        stockFabricQty: res?.data?.stockFabricQty,
+                        stockSkeletonQty: res?.data?.stockSkeletonQty
+                    })
                 })
             }
             await getFabricCharts().then((res) => {
@@ -290,10 +301,18 @@ export default function LuxuryProduct({ update = false }) {
         marbleType: Yup.string().test("isValid", "Bu alan zorunlu", (value) => {
             if (parseInt(formik.values.standType) === 2) {
                 if (parseInt(formik.values.marbleStatus) === 2) {
-                    if (parseInt(value) > 0) {
-                        return true
+                    if (parseInt(formik.values.shapeSizeType) === 9 || parseInt(formik.values.shapeSizeType) === 12 || parseInt(formik.values.shapeSizeType) === 13) {
+                        if (parseInt(value) === 7) {
+                            return true
+                        } else {
+                            return false
+                        }
                     } else {
-                        return false
+                        if (parseInt(value) > 0) {
+                            return true
+                        } else {
+                            return false
+                        }
                     }
                 } else {
                     return true
@@ -438,7 +457,6 @@ export default function LuxuryProduct({ update = false }) {
         onSubmit: async (values, { setSubmitting }) => {
             try {
                 setSubmitting(true)
-                console.log(values);
                 const fd = new FormData()
                 if (update) {
                     fd.append("Id", updateOrderId)
@@ -449,7 +467,7 @@ export default function LuxuryProduct({ update = false }) {
                 }
                 fd.append("ProductId", 3)
                 fd.append("OrderDetailNote", formik.values.orderNote)
-                
+
                 fd.append("Qty", formik.values.qty)
                 fd.append("Tax", 1)
                 fd.append("TaxType", formik.values.taxType)
@@ -467,7 +485,6 @@ export default function LuxuryProduct({ update = false }) {
                 }
                 fd.append("Flue", formik.values.flue)
                 fd.append("SkeletonChartId", formik.values.skeletonChartId)
-                fd.append("SkeletonChartCode", 1032)
                 fd.append("Fabric", formik.values.fabric)
 
                 if (parseInt(formik.values.fabric) !== 3) {
@@ -532,7 +549,23 @@ export default function LuxuryProduct({ update = false }) {
                 }
 
                 if (update) {
-                    await UpdateLuxuryUmbrella(fd).then((res) => {
+                    // await UpdateLuxuryUmbrella(fd).then((res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                    //     }
+                    //     setSubmitting(false)
+                    // })
+                    await getListStockControl(fd).then(async (res) => {
                         if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
                             openSnackbar({
                                 open: true,
@@ -544,12 +577,51 @@ export default function LuxuryProduct({ update = false }) {
                                 close: false
                             })
                         } else {
-                            navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                            if (res?.data?.length !== 0) {
+                                setFormDt(fd)
+                                setStockData(res?.data)
+                                setStockModal(true)
+                            } else {
+                                const updateFd = new FormData()
+                                updateFd.append('OrderDetailId', updateOrderId)
+                                await restoreStock(updateFd)
+                                await UpdateLuxuryUmbrella(fd).then((res) => {
+                                    if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                                        openSnackbar({
+                                            open: true,
+                                            message: `${res?.message ? res?.message : 'Error'}`,
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            close: false
+                                        })
+                                    } else {
+                                        navigate(`/orders/detail/product-detail/${updateOrderId}`)
+                                    }
+                                })
+                            }
                         }
                         setSubmitting(false)
                     })
                 } else {
-                    await CreateLuxuryUmbrella(fd).then((res) => {
+                    // await CreateLuxuryUmbrella(fd).then((res) => {
+                    //     if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                    //         openSnackbar({
+                    //             open: true,
+                    //             message: `${res?.message ? res?.message : 'Error'}`,
+                    //             variant: 'alert',
+                    //             alert: {
+                    //                 color: 'error'
+                    //             },
+                    //             close: false
+                    //         })
+                    //     } else {
+                    //         navigate(`/orders/detail/${orderId}`)
+                    //     }
+                    //     setSubmitting(false)
+                    // })
+                    await getListStockControl(fd).then(async (res) => {
                         if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
                             openSnackbar({
                                 open: true,
@@ -561,7 +633,28 @@ export default function LuxuryProduct({ update = false }) {
                                 close: false
                             })
                         } else {
-                            navigate(`/orders/detail/${orderId}`)
+                            if (res?.data?.length !== 0) {
+                                setFormDt(fd)
+                                setStockData(res?.data)
+                                setStockModal(true)
+                            } else {
+                                await CreateLuxuryUmbrella(fd).then((res) => {
+                                    if (res?.errors || res?.statusCode === 400 || res?.statusCode === 500) {
+                                        openSnackbar({
+                                            open: true,
+                                            message: `${res?.message ? res?.message : 'Error'}`,
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            close: false
+                                        })
+                                    } else {
+                                        navigate(`/orders/detail/${orderId}`)
+                                    }
+                                })
+                            }
+
                         }
                         setSubmitting(false)
                     })
@@ -573,6 +666,7 @@ export default function LuxuryProduct({ update = false }) {
     });
 
     const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
+    
 
     let breadcrumbLinks = [{ title: 'Sipariş Yönetimi', to: '/orders/list' }, { title: 'Detay', to: `/orders/detail/${data?.orderId}` }, { title: 'Ürün Detayı', to: `/orders/detail/product-detail/${updateOrderId}` }, { title: 'Ürün Düzenle' }, { title: 'Mekanizmalı Lüks Şemsiye', }]
 
@@ -606,6 +700,7 @@ export default function LuxuryProduct({ update = false }) {
 
     return (
         <>
+            <StockControlModal qty={prevStockData} productId={3} update={update} stockData={stockData} formDt={formDt} open={stockModal} modalToggler={setStockModal} />
             {
                 update &&
                 <Breadcrumbs custom links={breadcrumbLinks} />
@@ -985,9 +1080,9 @@ export default function LuxuryProduct({ update = false }) {
                                                     disableClearable
                                                     id="basic-autocomplete-label"
                                                     options={skeletonCharts}
-                                                    getOptionLabel={(option) => `${option?.name}`}
+                                                    getOptionLabel={(option) => `${option?.name}` || ''}
                                                     onChange={(e, value) => { setFieldValue("skeletonChartId", value?.id); setFieldValue("skeletonChartCode", value?.code) }}
-                                                    value={skeletonCharts?.find((item) => item?.id === parseInt(formik.values.skeletonChartId))}
+                                                    value={skeletonCharts?.find((item) => item?.id === parseInt(formik.values.skeletonChartId)) || null}
                                                     renderInput={(params) => <TextField error={Boolean(errors.skeletonChartId)} helperText={errors.skeletonChartId} {...params} label="İskelet Renk Seçimi" />}
                                                 />
                                             </Grid>
@@ -1070,9 +1165,9 @@ export default function LuxuryProduct({ update = false }) {
                                                                             disableClearable
                                                                             id="basic-autocomplete-label"
                                                                             options={acrylicColors}
-                                                                            getOptionLabel={(option) => `${option?.name}`}
+                                                                            getOptionLabel={(option) => `${option?.name}` || ''}
                                                                             onChange={(e, value) => { setFieldValue('acrylicColor', value?.code); setFieldValue('fabricChartId', value?.id) }}
-                                                                            value={acrylicColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.acrylicColor))}
+                                                                            value={acrylicColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.acrylicColor)) || null}
                                                                             renderInput={(params) => <TextField error={Boolean(errors.acrylicColor)} helperText={errors.acrylicColor} {...params} label="Lütfen Akrilik Renk Seçiniz" />}
                                                                         />
                                                                     </Grid>
@@ -1095,9 +1190,9 @@ export default function LuxuryProduct({ update = false }) {
                                                                             id="basic-autocomplete-label"
                                                                             options={localColors}
                                                                             disableClearable
-                                                                            getOptionLabel={(option) => `${option?.name}`}
+                                                                            getOptionLabel={(option) => `${option?.name}` || ''}
                                                                             onChange={(e, value) => { setFieldValue('localColor', value?.code); setFieldValue('fabricChartId', value?.id) }}
-                                                                            value={localColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.localColor))}
+                                                                            value={localColors?.find((item) => parseInt(item?.code) === parseInt(formik.values.localColor)) || null}
                                                                             renderInput={(params) => <TextField error={Boolean(errors.localColor)} helperText={errors.localColor} {...params} label="Lütfen Yerli Renk Seçiniz" />}
                                                                         />
                                                                     </Grid>
@@ -1247,42 +1342,47 @@ export default function LuxuryProduct({ update = false }) {
                                                         <FormControl style={{ width: '100%' }} component="fieldset">
                                                             <RadioGroup id='marbleType' name="radio-marbleType" row>
                                                                 <Grid container spacing={3}>
-                                                                    <Grid item lg={3} xs={12}>
-                                                                        <Box onClick={() => setFieldValue('marbleType', "1")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
-                                                                            <label>
-                                                                                <span>
-                                                                                    <input style={{ width: '20px', height: '20px' }} value="1" checked={formik.values.marbleType === "1" ? true : false} onChange={(e) => setFieldValue('marbleType', "1")} name='radio-marbleType' type="radio" />
-                                                                                </span>
-                                                                                <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
-                                                                                    85 x 85 (4 Mermerli)
-                                                                                </span>
-                                                                            </label>
-                                                                        </Box>
-                                                                    </Grid>
-                                                                    <Grid item lg={3} xs={12}>
-                                                                        <Box onClick={() => setFieldValue('marbleType', "3")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
-                                                                            <label htmlFor="">
-                                                                                <span>
-                                                                                    <input style={{ width: '20px', height: '20px' }} value="3" checked={formik.values.marbleType === "3" ? true : false} onChange={(e) => setFieldValue('marbleType', "3")} name='radio-marbleType' type="radio" />
-                                                                                </span>
-                                                                                <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
-                                                                                    85 x 85 (8 Mermerli)
-                                                                                </span>
-                                                                            </label>
-                                                                        </Box>
-                                                                    </Grid>
-                                                                    <Grid item lg={3} xs={12}>
-                                                                        <Box onClick={() => setFieldValue('marbleType', "6")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
-                                                                            <label htmlFor="">
-                                                                                <span>
-                                                                                    <input style={{ width: '20px', height: '20px' }} value="6" checked={formik.values.marbleType === "6" ? true : false} onChange={(e) => setFieldValue('marbleType', "6")} name='radio-marbleType' type="radio" />
-                                                                                </span>
-                                                                                <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
-                                                                                    100 x 100 (4 Mermerli)
-                                                                                </span>
-                                                                            </label>
-                                                                        </Box>
-                                                                    </Grid>
+                                                                    {
+                                                                        (parseInt(formik.values.shapeSizeType) !== 9 && parseInt(formik.values.shapeSizeType) !== 12 && parseInt(formik.values.shapeSizeType) !== 13) &&
+                                                                        <>
+                                                                            <Grid item lg={3} xs={12}>
+                                                                                <Box onClick={() => setFieldValue('marbleType', "1")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                                    <label>
+                                                                                        <span>
+                                                                                            <input style={{ width: '20px', height: '20px' }} value="1" checked={formik.values.marbleType === "1" ? true : false} onChange={(e) => setFieldValue('marbleType', "1")} name='radio-marbleType' type="radio" />
+                                                                                        </span>
+                                                                                        <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
+                                                                                            85 x 85 (4 Mermerli)
+                                                                                        </span>
+                                                                                    </label>
+                                                                                </Box>
+                                                                            </Grid>
+                                                                            <Grid item lg={3} xs={12}>
+                                                                                <Box onClick={() => setFieldValue('marbleType', "3")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                                    <label htmlFor="">
+                                                                                        <span>
+                                                                                            <input style={{ width: '20px', height: '20px' }} value="3" checked={formik.values.marbleType === "3" ? true : false} onChange={(e) => setFieldValue('marbleType', "3")} name='radio-marbleType' type="radio" />
+                                                                                        </span>
+                                                                                        <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
+                                                                                            85 x 85 (8 Mermerli)
+                                                                                        </span>
+                                                                                    </label>
+                                                                                </Box>
+                                                                            </Grid>
+                                                                            <Grid item lg={3} xs={12}>
+                                                                                <Box onClick={() => setFieldValue('marbleType', "6")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                                    <label htmlFor="">
+                                                                                        <span>
+                                                                                            <input style={{ width: '20px', height: '20px' }} value="6" checked={formik.values.marbleType === "6" ? true : false} onChange={(e) => setFieldValue('marbleType', "6")} name='radio-marbleType' type="radio" />
+                                                                                        </span>
+                                                                                        <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
+                                                                                            100 x 100 (4 Mermerli)
+                                                                                        </span>
+                                                                                    </label>
+                                                                                </Box>
+                                                                            </Grid>
+                                                                        </>
+                                                                    }
                                                                     <Grid item lg={3} xs={12}>
                                                                         <Box onClick={() => setFieldValue('marbleType', "7")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleType ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
                                                                             <label htmlFor="">

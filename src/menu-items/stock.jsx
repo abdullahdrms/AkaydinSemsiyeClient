@@ -19,12 +19,19 @@ const stock = {
   title: <FormattedMessage id="stock-group-title" />,
   type: 'group',
   children: [
+    // {
+    //   id: 'stock-list-title',
+    //   title: <FormattedMessage id="stock-list-title" />,
+    //   type: 'item',
+    //   icon: icons.maintenance,
+    //   url: '/stock/stock-list'
+    // },
     {
-      id: 'stock-list-title',
-      title: <FormattedMessage id="stock-list-title" />,
+      id: 'semi-finished-list-title',
+      title: <FormattedMessage id="semi-finished-list-title" />,
       type: 'item',
       icon: icons.maintenance,
-      url: '/stock/stock-list'
+      url: '/stock/semi-finished-list'
     },
     {
       id: 'material-list-title',
@@ -32,13 +39,6 @@ const stock = {
       type: 'item',
       icon: icons.maintenance,
       url: '/stock/material-list'
-    },
-    {
-      id: 'semi-finished-list-title',
-      title: <FormattedMessage id="semi-finished-list-title" />,
-      type: 'item',
-      icon: icons.maintenance,
-      url: '/stock/semi-finished-list'
     }
   ]
 };

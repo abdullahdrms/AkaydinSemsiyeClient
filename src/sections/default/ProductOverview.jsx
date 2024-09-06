@@ -113,7 +113,7 @@ function ApexPieChart({ bestProductMonthCount }) {
 
 // ==============================|| CHART WIDGETS - PRODUCT OVERVIEW ||============================== //
 
-export default function ProductOverview({ bestProductMonthCount }) {
+export default function ProductOverview({ bestProductMonthCount, label = '' }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const open = Boolean(anchorEl);
@@ -131,7 +131,7 @@ export default function ProductOverview({ bestProductMonthCount }) {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-            <Typography variant="h5">Aylık en çok satılan ürün</Typography>
+            <Typography variant="h5">{label}</Typography>
             {/* <IconButton
               color="secondary"
               id="wallet-button"

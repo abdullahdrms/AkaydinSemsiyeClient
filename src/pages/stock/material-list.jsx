@@ -259,7 +259,6 @@ export default function MaterialList() {
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         // setSelectedStock()
-                                        console.log(row);
                                         setSelectedStock(row?.original)
                                         setStockModal(true)
                                     }}
