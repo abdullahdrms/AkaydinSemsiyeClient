@@ -26,8 +26,8 @@ const updateMaterial = (fd) => {
     return post(`/Materials/Update`, fd, true, true);
 }
 
-const getSemiFinished = () => {
-    return get(`/SemiFinished/GetList`, true);
+const getSemiFinished = ({ page, size, storage = 0, stockType = 0 }) => {
+    return get(`/SemiFinished/GetList?Pagination.Page=${page}&Pagination.Size=${size}${storage !== 0 ? `&Storages=${storage}` : ''}${stockType !== 0 ? `&StockType=${stockType}` : ''}`, true);
 }
 
 const createSemiFinished = (fd) => {

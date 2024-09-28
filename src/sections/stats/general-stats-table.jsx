@@ -145,6 +145,20 @@ export default function GeneralStatsTable() {
         return turkishMonths.find((item) => item.id == number).name
     }
 
+    const findMaxPrice = (arr) => {
+        let maxPriceInfo = { price: -Infinity, month: null, year: null };
+
+        arr.forEach(item => {
+            item.years.forEach(yearInfo => {
+                if (yearInfo.price > maxPriceInfo.price) {
+                    maxPriceInfo = { price: yearInfo.price, month: item.month, year: yearInfo.year };
+                }
+            });
+        });
+
+        return maxPriceInfo;
+    };
+
     if (loading) return <Loader open={loading} />
 
     return (
@@ -252,7 +266,7 @@ export default function GeneralStatsTable() {
                                                         item?.years.map((year, y) => {
                                                             return (
                                                                 <React.Fragment key={y}>
-                                                                    <TableCell style={{ textAlign: 'center' }}>{year?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                                                    <TableCell style={{ textAlign: 'center', backgroundColor: `${(findMaxPrice(data).month === item?.month && findMaxPrice(data).year === year.year && year?.price > 0) ? 'green' : ''}`, color: `${(findMaxPrice(data).month === item?.month && findMaxPrice(data).year === year.year && year?.price > 0) ? 'white' : ''}` }}>{year?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
                                                                     <TableCell style={{ textAlign: 'center' }}>-</TableCell>
                                                                 </React.Fragment>
                                                             )

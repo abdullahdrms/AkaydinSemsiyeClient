@@ -1,8 +1,8 @@
 import { get, post, remove, put } from './request';
 
 
-const GetOrders = ({ pageSize = 10, page = 1, searchVal = "" }) => {
-    return get(`/Orders/GetList?size=${pageSize}&page=${page}&CustomerName=${searchVal}`, true);
+const GetOrders = ({ pageSize = 10, page = 1, searchVal = "", orderStatusType = null, price = null, orderDate = null, deadlineDate = null }) => {
+    return get(`/Orders/GetList?size=${pageSize}&page=${page}&CustomerName=${searchVal}${orderStatusType !== null ? `&OrderStatusType=${orderStatusType}` : ''}${price !== null ? `&Price=${price}` : ''}${orderDate !== null ? `&OrderDate=${orderDate}` : ''}${deadlineDate !== null ? `&DeadlineDate=${deadlineDate}` : ''}`, true);
 }
 
 const CreateOrder = (fd) => {
@@ -97,6 +97,9 @@ const GetListDeadline = (id) => {
     return get(`/Orders/GetListDeadline`, true);
 }
 
+const GetOrderListAll = ({ page, size }) => {
+    return get(`/Orders/GetOrderListAll?Page=${page}&Size=${size}`, true);
+}
 
 
-export { GetOrders, CreateOrder, GetDetail, UpdateOrder, CreateCamellia, CreateLuxuryUmbrella, CreateEcoUmbrella, CreateSidePoloUmbrella, CreateClassicUmbrella, CreateSparePartsService, CreateWoodenUmbrella, CreateBeachUmbrella, GetOrderDetail, DeleteUmrella, UpdateCamellia, UpdateLuxuryUmbrella, UpdateEcoUmbrella, UpdateSidePoloUmbrella, UpdateClassicUmbrella, UpdateSparePartsService, UpdateWoodenUmbrella, UpdateBeachUmbrella, GetOrderDeliveryList ,GetListDeadline}
+export { GetOrders, CreateOrder, GetDetail, UpdateOrder, CreateCamellia, CreateLuxuryUmbrella, CreateEcoUmbrella, CreateSidePoloUmbrella, CreateClassicUmbrella, CreateSparePartsService, CreateWoodenUmbrella, CreateBeachUmbrella, GetOrderDetail, DeleteUmrella, UpdateCamellia, UpdateLuxuryUmbrella, UpdateEcoUmbrella, UpdateSidePoloUmbrella, UpdateClassicUmbrella, UpdateSparePartsService, UpdateWoodenUmbrella, UpdateBeachUmbrella, GetOrderDeliveryList, GetListDeadline, GetOrderListAll }

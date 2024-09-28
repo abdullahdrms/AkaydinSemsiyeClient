@@ -3,7 +3,7 @@ import { useMemo, useState, Fragment, useEffect } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Chip, Divider, Stack, Button, Table, TableCell, TableBody, TableHead, TableRow, TableContainer, Tooltip, Typography, Box } from '@mui/material';
+import { Chip, Divider, Stack, Button, Table, TableCell, TableBody, TableHead, TableRow, TableContainer, Tooltip, Typography, Box, Grid, Autocomplete, TextField } from '@mui/material';
 
 // third-party
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
@@ -29,7 +29,7 @@ import SemiFinishedCreateModal from 'sections/stock/SemiFinishedCreateModal';
 
 // ==============================|| REACT TABLE - LIST ||============================== //
 const fallbackData = [];
-function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter, setStockModal }) {
+function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter, setStockModal, setStorage, setStockType, storage, stockType }) {
 
     const navigate = useNavigate();
 
@@ -61,6 +61,19 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
             })
     );
 
+    const storageTypes = [
+        { id: 0, name: 'Hepsi' },
+        { id: 1, name: 'Şirket Depo' },
+        { id: 2, name: 'Bozhane Depo' },
+        { id: 3, name: 'Ümraniye Depo' }
+    ]
+
+    const stockTypes = [
+        { id: 0, name: 'Hepsi' },
+        { id: 1, name: 'İskelet' },
+        { id: 2, name: 'Kumaş' },
+        { id: 3, name: 'Ayak' }
+    ]
 
     return (
         <>
@@ -72,6 +85,36 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                         placeholder={`Search ${data?.data?.length} records...`}
                     />
                     <Stack direction="row" alignItems="center" spacing={2}>
+                        <Grid item marginBottom={2} marginTop={2} xs={4}>
+                            <Autocomplete
+                                disableClearable
+                                fullWidth
+                                id="basic-autocomplete-label"
+                                options={storageTypes}
+                                value={storageTypes.find((itm) => itm.id === storage) || null}
+                                getOptionLabel={(option) => `${option?.name}` || ''}
+                                isOptionEqualToValue={(option) => option.id === storage}
+                                ListboxProps={{ style: { maxHeight: 150 } }}
+                                style={{ width: '170px' }}
+                                onChange={(e, value) => setStorage(value.id)}
+                                renderInput={(params) => <TextField label="Depo" {...params} />}
+                            />
+                        </Grid>
+                        <Grid item marginBottom={2} marginTop={2} xs={4}>
+                            <Autocomplete
+                                disableClearable
+                                fullWidth
+                                id="basic-autocomplete-label2"
+                                options={stockTypes}
+                                getOptionLabel={(option) => `${option?.name}` || ''}
+                                isOptionEqualToValue={(option) => option.id === stockType}
+                                value={stockTypes.find((itm) => itm.id === stockType) || null}
+                                ListboxProps={{ style: { maxHeight: 150 } }}
+                                style={{ width: '170px' }}
+                                onChange={(e, value) => setStockType(value.id)}
+                                renderInput={(params) => <TextField label="Stok Tipi" {...params} />}
+                            />
+                        </Grid>
                         <Button variant="contained" startIcon={<Add />} onClick={() => { setStockModal(true) }} size="large">
                             Stok Ekle
                         </Button>
@@ -168,6 +211,8 @@ export default function SemiFinishedList() {
     const [stockModal, setStockModal] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [selectedStock, setSelectedStock] = useState(undefined)
+    const [storage, setStorage] = useState(0)
+    const [stockType, setStockType] = useState(0)
 
     const [pagination, setPagination] = useState({
         pageIndex: 0,
@@ -180,8 +225,8 @@ export default function SemiFinishedList() {
 
     useEffect(() => {
         setLoading(true)
-        getSemiFinished().then((res) => { setData(res); setLoading(false); })
-    }, [pagination.pageIndex, pagination.pageSize, sorting, globalFilter]);
+        getSemiFinished({ page: pagination.pageIndex, size: pagination.pageSize, storage: storage, stockType: stockType }).then((res) => { setData(res); setLoading(false); })
+    }, [pagination.pageIndex, pagination.pageSize, sorting, globalFilter, storage, stockType]);
 
     useEffect(() => {
         setPagination({ ...pagination, pageIndex: 0 })
@@ -191,7 +236,7 @@ export default function SemiFinishedList() {
         if (isEdit) {
             setIsEdit(false)
             setLoading(true)
-            getSemiFinished().then((res) => { setData(res); setLoading(false); })
+            getSemiFinished({ page: pagination.pageIndex, size: pagination.pageSize, storage: storage, stockType: stockType }).then((res) => { setData(res); setLoading(false); })
         }
     }, [isEdit])
 
@@ -301,7 +346,11 @@ export default function SemiFinishedList() {
                     sorting,
                     globalFilter,
                     setGlobalFilter,
-                    setStockModal
+                    setStockModal,
+                    setStockType,
+                    setStorage,
+                    storage,
+                    stockType
                 }}
             />
             <OrderModalDelete setIsDeleted={setIsDeleted} setLoading={setLoading} id={Number(customerDeleteId)} title={customerDeleteId} open={orderModalDelete} handleClose={handleClose} />

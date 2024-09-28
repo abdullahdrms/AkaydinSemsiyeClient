@@ -76,6 +76,8 @@ function request(
       if (response?.status === 404) {
         return reject("404");
       } else if (response?.status === 401) {
+        localStorage.removeItem('serviceToken')
+        location.replace('/login')
         return reject("Unauthorized");
       } else if (response?.status === 403) {
         return reject("Forbidden");

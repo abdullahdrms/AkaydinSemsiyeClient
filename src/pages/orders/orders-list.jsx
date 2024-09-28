@@ -18,17 +18,18 @@ import OrderModalDelete from 'sections/facilities/OrderModalDelete';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
 // assets
-import { Add, Edit, Eye, Trash } from 'iconsax-react';
+import { Add, Edit, Eye, InfoCircle, Trash } from 'iconsax-react';
 
 // custom
 import Loader from 'components/Loader';
 import { useNavigate } from 'react-router-dom';
 import { GetOrders } from 'services/ordersServices';
 import { formatDate, stringToDate } from 'utils/custom/dateHelpers';
+import OrdersPopup from 'sections/facilities/OrdersPopup';
 
 // ==============================|| REACT TABLE - LIST ||============================== //
 const fallbackData = [];
-function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter, setRowSelection, rowSelection }) {
+function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter, setRowSelection, rowSelection, setOrdersPopup, ordersPopup }) {
 
     const [query, setQuery] = useState('')
     const navigate = useNavigate();
@@ -89,6 +90,9 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                         placeholder={`Search ${data?.totalCount} records...`}
                     />
                     <Stack direction="row" alignItems="center" spacing={2}>
+                        <Button variant="contained" color='info' startIcon={<Add />} onClick={() => setOrdersPopup(true)} size="large">
+                            Liste
+                        </Button>
                         <Button variant="contained" color='success' startIcon={<Add />} onClick={() => { if (query !== '') navigate(`/orders/delivery-list-print?id=${query}`); }} size="large">
                             Teslimat Listesi Oluştur
                         </Button>
@@ -177,10 +181,9 @@ export default function OrderList() {
     const navigate = useNavigate()
     const theme = useTheme();
 
-    const [sorting, setSorting] = useState([{ id: 'id', desc: true }]);
+    const [sorting, setSorting] = useState([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [rowSelection, setRowSelection] = useState({})
-
 
     const [customerDeleteId, setCustomerDeleteId] = useState('');
     const [isDeleted, setIsDeleted] = useState(false)
@@ -193,11 +196,13 @@ export default function OrderList() {
 
     const [data, setData] = useState(() => []);
 
+    const [ordersPopup, setOrdersPopup] = useState(false)
+
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setLoading(true)
-        GetOrders({ pageSize: pagination.pageSize, page: pagination.pageIndex, searchVal: globalFilter }).then((res) => { setData(res); setLoading(false); })
+        GetOrders({ pageSize: pagination.pageSize, page: pagination.pageIndex, searchVal: globalFilter, orderStatusType: sorting[0]?.id === 'orderStatusType' ? sorting[0]?.desc ? 'desc' : 'asc' : null, price: sorting[0]?.id === 'price' ? sorting[0]?.desc ? 'desc' : 'asc' : null, orderDate: sorting[0]?.id === 'orderDate' ? sorting[0]?.desc ? 'desc' : 'asc' : null, deadlineDate: sorting[0]?.id === 'deadlineDate' ? sorting[0]?.desc ? 'desc' : 'asc' : null }).then((res) => { setData(res); setLoading(false); })
     }, [pagination.pageIndex, pagination.pageSize, sorting, globalFilter]);
 
     useEffect(() => {
@@ -242,7 +247,19 @@ export default function OrderList() {
             },
             {
                 header: 'Sipariş No',
-                cell: ({ row }) => { return row?.original?.orderNumber }
+                cell: ({ row }) => (
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Tooltip title={`${row?.original?.person?.name} ${row?.original?.person?.surName}`}>
+                            <IconButton color="warning">
+                                <InfoCircle />
+                            </IconButton>
+                        </Tooltip>
+                        <Stack spacing={0}>
+                            <Typography variant="subtitle1">{row?.original?.orderNumber}</Typography>
+                        </Stack>
+
+                    </Stack>
+                )
             },
             {
                 header: 'Müşteri',
@@ -288,6 +305,7 @@ export default function OrderList() {
             },
             {
                 header: 'Tutar',
+                accessorKey: 'price',
                 cell: ({ row }) => {
                     return (
                         <div>
@@ -299,10 +317,12 @@ export default function OrderList() {
             },
             {
                 header: 'Sipariş Tarihi',
+                accessorKey: 'orderDate',
                 cell: ({ row }) => { return formatDate(stringToDate(row?.original?.createdAt)) }
             },
             {
                 header: 'Termin Tarihi',
+                accessorKey: 'deadlineDate',
                 cell: ({ row }) => { return formatDate(stringToDate(row?.original?.deadline)) }
             },
             {
@@ -373,10 +393,13 @@ export default function OrderList() {
                     globalFilter,
                     setGlobalFilter,
                     setRowSelection,
-                    rowSelection
+                    rowSelection,
+                    setOrdersPopup,
+                    ordersPopup
                 }}
             />
             <OrderModalDelete setIsDeleted={setIsDeleted} setLoading={setLoading} id={Number(customerDeleteId)} title={customerDeleteId} open={orderModalDelete} handleClose={handleClose} />
+            <OrdersPopup open={ordersPopup} modalToggler={setOrdersPopup} />
         </>
     );
 }

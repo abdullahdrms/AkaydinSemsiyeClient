@@ -25,7 +25,8 @@ const getInitialValues = (selectedStock) => {
         const editStockForm = {
             amount: selectedStock?.qty || 0,
             stockCode: selectedStock?.stockCode || '',
-            title: selectedStock?.name || ''
+            title: selectedStock?.name || '',
+            storage: selectedStock?.storages || 0,
         };
         return editStockForm;
     } else {
@@ -49,7 +50,8 @@ const getInitialValues = (selectedStock) => {
             acrylicColor: 0,
             localColor: 0,
             fringe: "",
-            standType: ""
+            standType: "",
+            storage: 0,
         };
         return newStockForm;
     }
@@ -96,6 +98,7 @@ export default function SemiFinishedCreateForm({ closeModal, setIsEdit, selected
         title: Yup.string().required('Lütfen başlık yazınız.'),
         amount: Yup.number().min(1).required('Lütfen tutar yazınız..'),
         stockCode: Yup.string().required('Lütfen stok kodu yazınız.'),
+        storage: Yup.number().min(1).required('Lütfen depoyu seçiniz.'),
         // stockType: Yup.number().min(1).required('Lütfen stok tipi seçiniz.'),
         stockType: Yup.number().test("isValid", "Bu alan zorunlu", (value) => {
             if (selectedStock === undefined) {
@@ -293,6 +296,7 @@ export default function SemiFinishedCreateForm({ closeModal, setIsEdit, selected
                 fd.append("Name", formik.values.title)
                 fd.append("StockCode", formik.values.stockCode)
                 fd.append("Qty", formik.values.amount)
+                fd.append("Storages", formik.values.storage)
                 if (selectedStock !== undefined) {
                     fd.append("Id", selectedStock?.id)
                 }
@@ -341,6 +345,21 @@ export default function SemiFinishedCreateForm({ closeModal, setIsEdit, selected
     const { handleChange, handleSubmit, isSubmitting, errors, setFieldValue, values, getFieldProps } = formik;
 
     if (loading) return <Loader open={loading} />
+
+    const storageTypes = [
+        {
+            id: 1,
+            name: "Şirket Depo",
+        },
+        {
+            id: 2,
+            name: "Bozhane Depo",
+        },
+        {
+            id: 3,
+            name: "Ümraniye Depo",
+        }
+    ]
 
     return (
         <>
@@ -403,6 +422,55 @@ export default function SemiFinishedCreateForm({ closeModal, setIsEdit, selected
                                                 <p style={{ color: '#dc2626', fontWeight: 400, fontSize: '0.75rem', textAlign: 'left' }}>Bu alan zorunlu</p>
                                             }
                                         </Grid>
+                                        {/* <Grid marginBottom={0} item xs={12}>
+                                            <InputLabel style={{ marginBottom: '20px' }}>Depo</InputLabel>
+                                            <FormControl style={{ width: '100%' }} component="fieldset">
+                                                <RadioGroup id='storage' name="radio-storage" row>
+                                                    <Grid container spacing={3}>
+                                                        <Grid item lg={3} xs={12}>
+                                                            <Box onClick={() => setFieldValue('storage', "1")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.storage ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                <label>
+                                                                    <span>
+                                                                        <input style={{ width: '20px', height: '20px' }} value="1" checked={formik.values.storage === "1" ? true : false} onChange={(e) => setFieldValue('storage', "1")} name='radio-storage' type="radio" />
+                                                                    </span>
+                                                                    <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
+                                                                        Şirket Depo
+                                                                    </span>
+                                                                </label>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item lg={3} xs={12}>
+                                                            <Box onClick={() => setFieldValue('storage', "2")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.storage ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                <label>
+                                                                    <span>
+                                                                        <input style={{ width: '20px', height: '20px' }} value="2" checked={formik.values.storage === "2" ? true : false} onChange={(e) => setFieldValue('storage', "2")} name='radio-storage' type="radio" />
+                                                                    </span>
+                                                                    <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
+                                                                        Bozhane Depo
+                                                                    </span>
+                                                                </label>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item lg={3} xs={12}>
+                                                            <Box onClick={() => setFieldValue('storage', "3")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.storage ? '#dc2626' : 'grey'}`, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                <label htmlFor="">
+                                                                    <span>
+                                                                        <input style={{ width: '20px', height: '20px' }} value="3" checked={formik.values.storage === "3" ? true : false} onChange={(e) => setFieldValue('storage', "3")} name='radio-storage' type="radio" />
+                                                                    </span>
+                                                                    <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
+                                                                        Ümraniye Depo
+                                                                    </span>
+                                                                </label>
+                                                            </Box>
+                                                        </Grid>
+                                                    </Grid>
+                                                </RadioGroup>
+                                            </FormControl>
+                                            {
+                                                errors.storage &&
+                                                <p style={{ color: '#dc2626', fontWeight: 400, fontSize: '0.75rem', textAlign: 'left' }}>Bu alan zorunlu</p>
+                                            }
+                                        </Grid> */}
                                         {
                                             (parseInt(formik.values.stockType) === 1 || parseInt(formik.values.stockType) === 2) &&
                                             <Grid marginBottom={0} item xs={12}>
@@ -1310,6 +1378,23 @@ export default function SemiFinishedCreateForm({ closeModal, setIsEdit, selected
                                             helperText={formik.touched.amount && formik.errors.amount}
                                         />
                                     </Stack>
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <Stack spacing={1}>
+                                        <InputLabel htmlFor="amount">Depo *</InputLabel>
+                                    </Stack>
+                                </Grid>
+                                <Grid item xs={10}>
+                                    <Autocomplete
+                                        fullWidth
+                                        disableClearable
+                                        id="basic-autocomplete-label"
+                                        options={storageTypes}
+                                        getOptionLabel={(option) => `${option?.name}` || ''}
+                                        onChange={(e, value) => setFieldValue("storage", value?.id)}
+                                        value={storageTypes?.find((item) => item?.id === parseInt(formik.values.storage)) || null}
+                                        renderInput={(params) => <TextField error={Boolean(errors.storage)} helperText={errors.storage} {...params} label="Depo seçimi" />}
+                                    />
                                 </Grid>
                             </Grid>
                         </DialogContent>
