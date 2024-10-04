@@ -11,6 +11,8 @@ import authReducer from 'store/reducers/auth';
 // project-imports
 import Loader from 'components/Loader';
 import axios from 'utils/axios';
+import { LoginService } from 'services/authServices';
+import { openSnackbar } from 'api/snackbar';
 
 const chance = new Chance();
 
@@ -99,17 +101,40 @@ export const JWTProvider = ({ children }) => {
     fd.append("Email", email);
     fd.append("Password", password);
 
-    const response = await axios.post('/Auth/Login', fd);
+    const response = await LoginService(fd).then((res) => {
+      if (res?.statusCode === 200 && res?.data?.token) {
+        const user = res?.data?.user;
+        setSession(res?.data?.token);
+        dispatch({
+          type: LOGIN,
+          payload: {
+            isLoggedIn: true,
+            user
+          }
+        });
+        openSnackbar({
+          open: true,
+          message: 'Giriş başarılı.',
+          variant: 'alert',
 
-    const user = response.data.user;
-    setSession(response?.data?.data?.token);
-    dispatch({
-      type: LOGIN,
-      payload: {
-        isLoggedIn: true,
-        user
+          alert: {
+            color: 'success'
+          }
+        });
+      } else {
+        openSnackbar({
+          open: true,
+          message: res?.message,
+          variant: 'alert',
+
+          alert: {
+            color: 'error'
+          }
+        });
       }
-    });
+
+    })
+
 
   };
 
