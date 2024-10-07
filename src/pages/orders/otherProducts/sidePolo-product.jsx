@@ -1142,10 +1142,10 @@ export default function SidePoloProduct({ update = false }) {
                                                             <RadioGroup id='marbleType' name="radio-marbleType" row>
                                                                 <Grid container spacing={3}>
                                                                     <Grid item lg={3} xs={12}>
-                                                                        <Box onClick={() => setFieldValue('marbleType', "1")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleStatus ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
+                                                                        <Box onClick={() => setFieldValue('marbleType', "5")} component="section" sx={{ p: 2, pl: 2, width: '100%', cursor: 'pointer', borderRadius: 1, border: `1px dashed ${errors.marbleStatus ? '#dc2626' : 'grey'}`, marginRight: 3, '&:hover': { bgcolor: '#f1faff', borderColor: '#009ef7' } }}>
                                                                             <label>
                                                                                 <span>
-                                                                                    <input style={{ width: '20px', height: '20px' }} value="1" checked={formik.values.marbleType === "1" ? true : false} onChange={(e) => setFieldValue('marbleType', "1")} name='radio-marbleType' type="radio" />
+                                                                                    <input style={{ width: '20px', height: '20px' }} value="5" checked={formik.values.marbleType === "5" ? true : false} onChange={(e) => setFieldValue('marbleType', "5")} name='radio-marbleType' type="radio" />
                                                                                 </span>
                                                                                 <span style={{ position: 'relative', bottom: '4px', left: '6px' }}>
                                                                                     Tekerlekli Döner Kaideli (4 Mermerli)
