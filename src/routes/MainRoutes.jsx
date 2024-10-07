@@ -39,6 +39,7 @@ import YearlyStats from 'pages/stats/yearly-stats';
 import GeneralStats from 'pages/stats/general-stats';
 import BusinessAdd from 'pages/customers/business-add';
 import BusinessUpdate from 'pages/customers/business-update';
+import ForeignCurrenciesList from 'pages/foreign-currencies/foreign-currencies-list';
 
 
 const ErrorPage = Loadable(lazy(() => import('pages/error-pages/404')));
@@ -130,6 +131,10 @@ const MainRoutes = {
             },
 
           ]
+        },
+        {
+          path: '/foreign-currencies',
+          element: <ForeignCurrenciesList />
         },
         {
           path: '/stock',

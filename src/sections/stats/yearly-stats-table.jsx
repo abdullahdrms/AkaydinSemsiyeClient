@@ -10,12 +10,13 @@ export default function YearlyStatsTable() {
     const [loading, setLoading] = useState(true)
     const [totalQty, setTotalQty] = useState(0)
     const [totalPrice, setTotalPrice] = useState(0)
+    const [currencyType, setCurrencyType] = useState(1)
 
     useEffect(() => {
         setData([])
         setTotalQty(0)
         setTotalPrice(0)
-        getYearlyStats({ year }).then((res) => {
+        getYearlyStats({ year, currencyType: currencyType }).then((res) => {
             setData(res?.data)
             res?.data?.map((itm) => {
                 setTotalQty((prevValue) => prevValue + itm?.qty)
@@ -23,7 +24,7 @@ export default function YearlyStatsTable() {
             })
             setLoading(false)
         })
-    }, [year])
+    }, [year, currencyType])
 
     const years = () => {
         let currentDate = new Date().getFullYear()
@@ -59,7 +60,7 @@ export default function YearlyStatsTable() {
                             id="basic-autocomplete-label"
                             options={['TL', 'USD']}
                             defaultValue='TL'
-                            // onChange={(e, value) => { setFieldValue('orderDetailStatus', value?.id) }}
+                            onChange={(e, value) => setCurrencyType(value === 'TL' ? 1 : value === 'USD' ? 2 : 1)}
                             renderInput={(params) => <TextField label="Kur" {...params} />}
                         />
                     </Grid>
@@ -136,8 +137,8 @@ export default function YearlyStatsTable() {
                                                                 <TableCell style={{ textAlign: 'center' }}>{item.shape[0].qtyAcrilic}</TableCell>
                                                                 <TableCell rowSpan={2} style={{ textAlign: 'center' }}>{item.shape[0].qty}</TableCell>
                                                                 <TableCell rowSpan={item.shape.length * 2} style={{ textAlign: 'center' }}>{item.qty}</TableCell>
-                                                                <TableCell rowSpan={2} style={{ textAlign: 'center' }}>{item.shape[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
-                                                                <TableCell rowSpan={item.shape.length * 2} style={{ textAlign: 'center' }}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                                                <TableCell rowSpan={2} style={{ textAlign: 'center' }}>{item.shape[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} {currencyType === 1 ? 'TL' : currencyType === 2 ? 'USD' : 'TL'}</TableCell>
+                                                                <TableCell rowSpan={item.shape.length * 2} style={{ textAlign: 'center' }}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} {currencyType === 1 ? 'TL' : currencyType === 2 ? 'USD' : 'TL'}</TableCell>
                                                             </TableRow>
                                                             <TableRow sx={[
                                                                 {
@@ -169,7 +170,7 @@ export default function YearlyStatsTable() {
                                                                     <TableCell style={{ textAlign: 'center' }}>Acrilic</TableCell>
                                                                     <TableCell style={{ textAlign: 'center' }}>{itemShape?.qtyAcrilic}</TableCell>
                                                                     <TableCell rowSpan={2} style={{ textAlign: 'center' }}>{itemShape?.qty}</TableCell>
-                                                                    <TableCell rowSpan={2} style={{ textAlign: 'center' }}>{itemShape.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                                                    <TableCell rowSpan={2} style={{ textAlign: 'center' }}>{itemShape.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} {currencyType === 1 ? 'TL' : currencyType === 2 ? 'USD' : 'TL'}</TableCell>
                                                                 </TableRow>
                                                                 <TableRow sx={[
                                                                     {
@@ -202,7 +203,7 @@ export default function YearlyStatsTable() {
                                     <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>TOPLAM SİPARİŞ</TableCell>
                                     <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>{totalQty}</TableCell>
                                     <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>SİPARİŞ TOPLAMI</TableCell>
-                                    <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>{totalPrice.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                    <TableCell rowSpan={2} style={{ textAlign: 'center', fontWeight: 'bold' }}>{totalPrice.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} {currencyType === 1 ? 'TL' : currencyType === 2 ? 'USD' : 'TL'}</TableCell>
                                 </TableRow>
                             </TableBody>
 

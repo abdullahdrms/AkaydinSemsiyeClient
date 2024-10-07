@@ -83,7 +83,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
     return (
         <>
             <MainCard content={false}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ padding: 3 }}>
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ padding: 3, overflowX: 'auto' }}>
                     <DebouncedInput
                         value={globalFilter ?? ''}
                         onFilterChange={(value) => setGlobalFilter(String(value))}

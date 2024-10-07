@@ -10,6 +10,7 @@ export default function GeneralStatsTable() {
     const [lastYear, setLastYear] = useState(new Date().getFullYear())
     const [loading, setLoading] = useState(true)
     const [total, setTotal] = useState([])
+    const [currencyType, setCurrencyType] = useState(1)
 
     useEffect(() => {
         setData([])
@@ -17,7 +18,7 @@ export default function GeneralStatsTable() {
         for (let index = firstYear; index <= lastYear; index++) {
             setTotal((prevValues) => [...prevValues, { year: parseInt(index), price: 0 }])
         }
-        getGeneralStats({ firstYear: firstYear, lastYear: lastYear }).then((res) => {
+        getGeneralStats({ firstYear: firstYear, lastYear: lastYear, currencyType: currencyType }).then((res) => {
             res?.data?.map((item) => {
                 item?.years?.map((year) => {
                     setTotal((prevTotal) =>
@@ -32,7 +33,7 @@ export default function GeneralStatsTable() {
             setData(res?.data)
             setLoading(false)
         })
-    }, [firstYear, lastYear])
+    }, [firstYear, lastYear, currencyType])
 
     const years = () => {
         let currentDate = new Date().getFullYear()
@@ -196,7 +197,7 @@ export default function GeneralStatsTable() {
                             id="basic-autocomplete-label"
                             options={['TL', 'USD']}
                             defaultValue='TL'
-                            // onChange={(e, value) => { setFieldValue('orderDetailStatus', value?.id) }}
+                            onChange={(e, value) => setCurrencyType(value === 'TL' ? 1 : value === 'USD' ? 2 : 1)}
                             renderInput={(params) => <TextField label="Kur" {...params} />}
                         />
                     </Grid>
@@ -266,7 +267,7 @@ export default function GeneralStatsTable() {
                                                         item?.years.map((year, y) => {
                                                             return (
                                                                 <React.Fragment key={y}>
-                                                                    <TableCell style={{ textAlign: 'center', backgroundColor: `${(findMaxPrice(data).month === item?.month && findMaxPrice(data).year === year.year && year?.price > 0) ? 'green' : ''}`, color: `${(findMaxPrice(data).month === item?.month && findMaxPrice(data).year === year.year && year?.price > 0) ? 'white' : ''}` }}>{year?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                                                    <TableCell style={{ textAlign: 'center', backgroundColor: `${(findMaxPrice(data).month === item?.month && findMaxPrice(data).year === year.year && year?.price > 0) ? 'green' : ''}`, color: `${(findMaxPrice(data).month === item?.month && findMaxPrice(data).year === year.year && year?.price > 0) ? 'white' : ''}` }}>{year?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} {currencyType === 1 ? 'TL' : currencyType === 2 ? 'USD' : 'TL'}</TableCell>
                                                                     <TableCell style={{ textAlign: 'center' }}>-</TableCell>
                                                                 </React.Fragment>
                                                             )
@@ -283,7 +284,7 @@ export default function GeneralStatsTable() {
                                         total?.map((item, i) => {
                                             return (
                                                 <React.Fragment key={i}>
-                                                    <TableCell style={{ textAlign: 'center', fontWeight: 'bold' }}>{item?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} TL</TableCell>
+                                                    <TableCell style={{ textAlign: 'center', fontWeight: 'bold' }}>{item?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} {currencyType === 1 ? 'TL' : currencyType === 2 ? 'USD' : 'TL'}</TableCell>
                                                     <TableCell style={{ textAlign: 'center', fontWeight: 'bold' }}>-</TableCell>
                                                 </React.Fragment>
                                             )

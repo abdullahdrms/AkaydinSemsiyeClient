@@ -26,10 +26,12 @@ import Loader from 'components/Loader';
 import { useNavigate } from 'react-router-dom';
 import { getMaterials, getSemiFinished } from 'services/stockServices';
 import SemiFinishedCreateModal from 'sections/stock/SemiFinishedCreateModal';
+import { GetAllForeign } from 'services/foreignCurrenciesService';
+import ForeignCurrenciesCreateModal from 'sections/foreign-currencies/ForeignCurrenciesCreateModal';
 
 // ==============================|| REACT TABLE - LIST ||============================== //
 const fallbackData = [];
-function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter, setStockModal, setStorage, setStockType, storage, stockType }) {
+function ReactTable({ data, columns, pagination, setPagination, setSorting, sorting, globalFilter, setGlobalFilter, setStockModal, year, setYear }) {
 
     const navigate = useNavigate();
 
@@ -61,24 +63,20 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
             })
     );
 
-    const storageTypes = [
-        { id: 0, name: 'Hepsi' },
-        { id: 1, name: 'Şirket Depo' },
-        { id: 2, name: 'Bozhane Depo' },
-        { id: 3, name: 'Ümraniye Depo' }
-    ]
+    const years = () => {
+        let currentDate = new Date().getFullYear()
+        let list = []
 
-    const stockTypes = [
-        { id: 0, name: 'Hepsi' },
-        { id: 1, name: 'İskelet' },
-        { id: 2, name: 'Kumaş' },
-        { id: 3, name: 'Ayak' }
-    ]
+        for (let index = 2022; index <= currentDate; index++) {
+            list.push(`${index}`)
+        }
+        return list
+    }
 
     return (
         <>
             <MainCard content={false}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ padding: 3,overflowX: 'auto' }}>
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ padding: 3, overflowX: 'auto' }}>
                     <DebouncedInput
                         value={globalFilter ?? ''}
                         onFilterChange={(value) => setGlobalFilter(String(value))}
@@ -90,29 +88,13 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
                                 disableClearable
                                 fullWidth
                                 id="basic-autocomplete-label"
-                                options={storageTypes}
-                                value={storageTypes.find((itm) => itm.id === storage) || null}
-                                getOptionLabel={(option) => `${option?.name}` || ''}
-                                isOptionEqualToValue={(option) => option.id === storage}
+                                options={years()}
+                                // getOptionLabel={(option) => `${option?.name}` || ''}
+                                value={years().find((itm) => itm === year.toString()) || null}
                                 ListboxProps={{ style: { maxHeight: 150 } }}
                                 style={{ width: '170px' }}
-                                onChange={(e, value) => setStorage(value.id)}
-                                renderInput={(params) => <TextField label="Depo" {...params} />}
-                            />
-                        </Grid>
-                        <Grid item marginBottom={2} marginTop={2} xs={4}>
-                            <Autocomplete
-                                disableClearable
-                                fullWidth
-                                id="basic-autocomplete-label2"
-                                options={stockTypes}
-                                getOptionLabel={(option) => `${option?.name}` || ''}
-                                isOptionEqualToValue={(option) => option.id === stockType}
-                                value={stockTypes.find((itm) => itm.id === stockType) || null}
-                                ListboxProps={{ style: { maxHeight: 150 } }}
-                                style={{ width: '170px' }}
-                                onChange={(e, value) => setStockType(value.id)}
-                                renderInput={(params) => <TextField label="Stok Tipi" {...params} />}
+                                onChange={(e, value) => setYear(value.toString())}
+                                renderInput={(params) => <TextField label="Yıl" {...params} />}
                             />
                         </Grid>
                         <Button variant="contained" startIcon={<Add />} onClick={() => { setStockModal(true) }} size="large">
@@ -198,7 +180,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
 }
 // ==============================|| CUSTOMER LIST ||============================== //
 
-export default function SemiFinishedList() {
+export default function ForeignCurrenciesList() {
     const theme = useTheme();
     const navigate = useNavigate()
 
@@ -211,8 +193,7 @@ export default function SemiFinishedList() {
     const [stockModal, setStockModal] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [selectedStock, setSelectedStock] = useState(undefined)
-    const [storage, setStorage] = useState(0)
-    const [stockType, setStockType] = useState(0)
+    const [year, setYear] = useState(new Date().getFullYear())
 
     const [pagination, setPagination] = useState({
         pageIndex: 0,
@@ -225,8 +206,8 @@ export default function SemiFinishedList() {
 
     useEffect(() => {
         setLoading(true)
-        getSemiFinished({ page: pagination.pageIndex, size: pagination.pageSize, storage: storage, stockType: stockType }).then((res) => { setData(res); setLoading(false); })
-    }, [pagination.pageIndex, pagination.pageSize, sorting, globalFilter, storage, stockType]);
+        GetAllForeign({ page: pagination.pageIndex, size: pagination.pageSize, year: year }).then((res) => { setData(res); setLoading(false); })
+    }, [pagination.pageIndex, pagination.pageSize, sorting, globalFilter, year]);
 
     useEffect(() => {
         setPagination({ ...pagination, pageIndex: 0 })
@@ -236,7 +217,7 @@ export default function SemiFinishedList() {
         if (isEdit) {
             setIsEdit(false)
             setLoading(true)
-            getSemiFinished({ page: pagination.pageIndex, size: pagination.pageSize, storage: storage, stockType: stockType }).then((res) => { setData(res); setLoading(false); })
+            GetAllForeign({ page: pagination.pageIndex, size: pagination.pageSize, year: year }).then((res) => { setData(res); setLoading(false); })
         }
     }, [isEdit])
 
@@ -244,35 +225,92 @@ export default function SemiFinishedList() {
         setOrderModalDelete(!orderModalDelete);
     };
 
+    const returnMonthName = (number) => {
+        const turkishMonths = [
+            {
+                id: 1,
+                name: "Ocak",
+                shortName: "Oca"
+            },
+            {
+                id: 2,
+                name: "Şubat",
+                shortName: "Şub"
+            },
+            {
+                id: 3,
+                name: "Mart",
+                shortName: "Mar"
+            },
+            {
+                id: 4,
+                name: "Nisan",
+                shortName: "Nis"
+            },
+            {
+                id: 5,
+                name: "Mayıs",
+                shortName: "May"
+            },
+            {
+                id: 6,
+                name: "Haziran",
+                shortName: "Haz"
+            },
+            {
+                id: 7,
+                name: "Temmuz",
+                shortName: "Tem"
+            },
+            {
+                id: 8,
+                name: "Ağustos",
+                shortName: "Ağu"
+            },
+            {
+                id: 9,
+                name: "Eylül",
+                shortName: "Eyl"
+            },
+            {
+                id: 10,
+                name: "Ekim",
+                shortName: "Eki"
+            },
+            {
+                id: 11,
+                name: "Kasım",
+                shortName: "Kas"
+            },
+            {
+                id: 12,
+                name: "Aralık",
+                shortName: "Ara"
+            }
+
+        ]
+        return turkishMonths.find((item) => item.id == number).name
+    }
+
     const columns = useMemo(
         () => [
 
             {
-                header: 'Başlık',
+                header: 'Ay',
                 cell: ({ row, getValue }) => (
                     <Stack direction="row" spacing={1.5} alignItems="center">
                         <Stack spacing={0}>
-                            <Typography variant="subtitle1">{row.original.name}</Typography>
+                            <Typography variant="subtitle1">{returnMonthName(row?.original?.month)}</Typography>
                         </Stack>
                     </Stack>
                 )
             },
             {
-                header: 'Stok Kodu',
+                header: 'Fiyat',
                 cell: ({ row, getValue }) => (
                     <Stack direction="row" spacing={1.5} alignItems="center">
                         <Stack spacing={0}>
-                            <Typography variant="subtitle1">{row.original.stockCode}</Typography>
-                        </Stack>
-                    </Stack>
-                )
-            },
-            {
-                header: 'Adet',
-                cell: ({ row, getValue }) => (
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                        <Stack spacing={0}>
-                            <Typography variant="subtitle1">{row.original.qty}</Typography>
+                            <Typography variant="subtitle1">{row.original.price} TL</Typography>
                         </Stack>
                     </Stack>
                 )
@@ -329,7 +367,7 @@ export default function SemiFinishedList() {
         ], // eslint-disable-next-line
         [theme]
     );
-    let breadcrumbLinks = [{ title: 'Stok Yönetimi' }, { title: 'Stok Listesi', to: `/stock/list` }];
+    let breadcrumbLinks = [{ title: 'Döviz Yönetimi' }, { title: 'Döviz Listesi', to: `/foreign-currencies` }];
 
     if (loading) return (<Loader open={loading} />)
 
@@ -347,14 +385,12 @@ export default function SemiFinishedList() {
                     globalFilter,
                     setGlobalFilter,
                     setStockModal,
-                    setStockType,
-                    setStorage,
-                    storage,
-                    stockType
+                    year,
+                    setYear
                 }}
             />
             <OrderModalDelete setIsDeleted={setIsDeleted} setLoading={setLoading} id={Number(customerDeleteId)} title={customerDeleteId} open={orderModalDelete} handleClose={handleClose} />
-            <SemiFinishedCreateModal selectedStock={selectedStock} setSelectedStock={setSelectedStock} setIsEdit={setIsEdit} open={stockModal} modalToggler={setStockModal} />
+            <ForeignCurrenciesCreateModal selectedStock={selectedStock} setSelectedStock={setSelectedStock} setIsEdit={setIsEdit} open={stockModal} modalToggler={setStockModal} />
         </>
     );
 }

@@ -63,16 +63,16 @@ export default function Customization() {
             >
               <Box sx={{ p: 2.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1.5}>
-                  <Typography variant="h5">What’s new announcement?</Typography>
+                  <Typography variant="h5">Duyurular</Typography>
                   <IconButton color="secondary" sx={{ p: 0 }} onClick={handleToggle}>
                     <Add size={28} style={{ transform: 'rotate(45deg)' }} />
                   </IconButton>
                 </Stack>
                 <Grid container spacing={1.5} sx={{ mt: 2 }}>
                   <Grid item xs={12}>
-                    <Typography variant="h6">Today</Typography>
+                    <Typography variant="h6">Hiç duyuru yok.</Typography>
                   </Grid>
-                  <Grid item xs={12}>
+                  {/* <Grid item xs={12}>
                     <MessageCard
                       status={{ label: 'New Feature', color: 'success' }}
                       time="just now"
@@ -120,7 +120,7 @@ export default function Customization() {
                       message="We've made some updates to the emendable widget which we think you are going to love."
                       src={message4}
                     />
-                  </Grid>
+                  </Grid> */}
                 </Grid>
               </Box>
             </SimpleBar>

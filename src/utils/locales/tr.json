@@ -42,5 +42,7 @@
     "stats-group-title" : "İstatistik",
     "monthly-stats-list-title" : "Aylık",
     "yearly-stats-list-title": "Yıllık",
-    "general-stats-list-title" : "Genel"
+    "general-stats-list-title" : "Genel",
+    "foreign-currencies-group-title" : "Döviz Yönetimi",
+    "foreign-currencies-list-title": "Döviz Listesi"
 }

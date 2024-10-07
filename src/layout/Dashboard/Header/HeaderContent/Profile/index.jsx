@@ -145,7 +145,7 @@ export default function ProfilePage() {
                           <Stack>
                             <Typography variant="subtitle1">{user?.name}</Typography>
                             <Typography variant="body2" color="secondary">
-                              UI/UX Designer
+                              Admin
                             </Typography>
                           </Stack>
                         </Stack>
@@ -174,7 +174,7 @@ export default function ProfilePage() {
                         label="Profile"
                         {...a11yProps(0)}
                       />
-                      <Tab
+                      {/* <Tab
                         sx={{
                           display: 'flex',
                           flexDirection: 'row',
@@ -185,7 +185,7 @@ export default function ProfilePage() {
                         icon={<Setting2 size={18} style={{ marginBottom: 0, marginRight: '10px' }} />}
                         label="Setting"
                         {...a11yProps(1)}
-                      />
+                      /> */}
                     </Tabs>
                   </Box>
                   <TabPanel value={value} index={0} dir={theme.direction}>
