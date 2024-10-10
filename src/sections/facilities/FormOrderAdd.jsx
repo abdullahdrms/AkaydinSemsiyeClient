@@ -47,8 +47,22 @@ export default function FormOrderAdd() {
   const [deadlineDate, setDeadlineDate] = useState(new Date())
 
   useEffect(() => {
-    GetAllCustomer().then((res) => { setCustomers(res?.data); setLoading(false); })
+    GetAllCustomer().then((res) => { setCustomers(res?.data) })
   }, []);
+
+  useEffect(() => {
+    if (customers.length > 0) {
+      const removeDuplicates = () => {
+        const uniquePeople = customers.filter((person, index, self) =>
+          index === self.findIndex((p) => p.firstName === person.firstName)
+        );
+        setCustomers(uniquePeople);
+        setLoading(false);
+      };
+      removeDuplicates()
+    }
+  }, [customers])
+
 
 
   const VillaSchema = Yup.object().shape({
@@ -165,7 +179,7 @@ export default function FormOrderAdd() {
                           fullWidth
                           id="basic-autocomplete-label"
                           options={customers}
-                          getOptionLabel={(option) => `${option?.firstName} ${option?.lastName}`}
+                          getOptionLabel={(option) => `${option?.firstName} ${option?.lastName}` || ''}
                           isOptionEqualToValue={(option, value) => option?.id === value?.id}
                           onChange={(e, value) => setFieldValue('customer', value?.id)}
                           renderInput={(params) => <TextField {...params} helperText={errors.customer} error={Boolean(errors.customer)} label="Lütfen Müşteri Seçiniz" />}

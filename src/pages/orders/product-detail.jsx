@@ -56,7 +56,7 @@ export default function ProductDetail() {
                                     Sipariş No
                                 </Typography>
                                 <Typography sx={{ textAlign: 'end' }} color='black' variant="subtitle1" fontSize={15} component="span">
-                                    #111
+                                    #{data?.orderId}
                                 </Typography>
                             </Typography>
                             <Divider sx={{ marginTop: 1.5 }} orientation="horizontal" variant="fullWidth" flexItem />

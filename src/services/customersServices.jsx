@@ -3,11 +3,11 @@ import { get, post, remove, put } from './request';
 
 
 const GetAllCustomer = () => {
-    return get(`/Customers/GetList`, true);
+    return get(`/Customers/GetList?Page=0&Size=9999`, true);
 }
 
-const GetFilterCustomer = ({ customerType = 1 }) => {
-    return get(`/Customers/GetList?customerType=${customerType}`, true);
+const GetFilterCustomer = ({ customerType = 1, page, size }) => {
+    return get(`/Customers/GetList?customerType=${customerType}&Page=${page}&Size=${size}`, true);
 }
 
 const GetCustomerDetail = (id) => {

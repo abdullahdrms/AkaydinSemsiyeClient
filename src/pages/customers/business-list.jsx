@@ -38,7 +38,7 @@ function ReactTable({ data, columns, pagination, setPagination, setSorting, sort
         getCoreRowModel: getCoreRowModel(),
         onPaginationChange: setPagination,
         onSortingChange: setSorting,
-        pageCount: data?.meta?.pagination?.pageCount || 1,
+        pageCount: (Math.ceil(data?.totalCount / pagination.pageSize)) || 1,
         autoResetPageIndex: false,
         state: {
             sorting,
@@ -176,7 +176,7 @@ export default function BusinessList() {
 
     useEffect(() => {
         setLoading(true)
-        GetFilterCustomer({ customerType: 2 }).then((res) => { setData(res); setLoading(false); })
+        GetFilterCustomer({ customerType: 2, page: pagination.pageIndex, size: pagination.pageSize }).then((res) => { setData(res); setLoading(false); })
     }, [pagination.pageIndex, pagination.pageSize, sorting, globalFilter]);
 
     useEffect(() => {
@@ -187,7 +187,7 @@ export default function BusinessList() {
         if (isDeleted) {
             setIsDeleted(false)
             setLoading(true)
-            GetFilterCustomer({ customerType: 2 }).then((res) => { setData(res); setLoading(false); })
+            GetFilterCustomer({ customerType: 2, page: pagination.pageIndex, size: pagination.pageSize }).then((res) => { setData(res); setLoading(false); })
         }
     }, [isDeleted])
 
